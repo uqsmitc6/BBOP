@@ -576,7 +576,7 @@
     
     // Verification function
     async function verifyStudentId() {
-      const studentId = studentIdInput.value.trim();
+      let studentId = studentIdInput.value.trim();
       errorMsg.textContent = ""; // clear previous errors
       
       if (!studentId) {
@@ -592,6 +592,16 @@
       if (!studentIdRegex.test(studentId) && !staffIdRegex.test(studentId)) {
         errorMsg.textContent = "Please enter a valid student ID in the format sXXXXXXX";
         return;
+      }
+      
+      // Normalize the case for student and staff IDs
+      // Student IDs start with 's' - convert to lowercase
+      if (studentId.toLowerCase().startsWith('s')) {
+        studentId = studentId.toLowerCase();
+      }
+      // Staff IDs start with 'uq' - convert to lowercase
+      else if (studentId.toLowerCase().startsWith('uq')) {
+        studentId = studentId.toLowerCase();
       }
       
       // Show loading message
