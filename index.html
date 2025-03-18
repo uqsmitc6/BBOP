@@ -91,12 +91,17 @@
       overflow: hidden;
       cursor: pointer;
       box-shadow: 0 0 50px rgba(81, 36, 122, 0.4);
+      transition: transform 0.3s ease;
+    }
+    
+    .bbop-container:active {
+      transform: scale(0.98);
     }
     
     .bbop-image {
       width: 100%;
       height: 100%;
-      object-fit: contain; /* Changed from cover to contain to prevent stretching */
+      object-fit: contain;
       transition: var(--transition);
       border-radius: 50%;
       border: 8px solid var(--primary-color);
@@ -118,6 +123,7 @@
       border-radius: 50%;
       padding: 40px;
       color: white;
+      z-index: 10;
     }
     
     .bbop-container:hover .bbop-image {
@@ -260,6 +266,12 @@
       box-shadow: 0 5px 30px rgba(0, 0, 0, 0.3);
       text-align: center;
       border-top: 5px solid var(--primary-color);
+      animation: fadeIn 0.5s ease;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
     
     #success-msg {
@@ -294,6 +306,7 @@
     .chat-interface {
       width: 100%;
       max-width: 900px;
+      animation: fadeIn 0.5s ease;
     }
     
     .student-info {
@@ -353,13 +366,7 @@
         font-size: 36px;
       }
       
-      /* For mobile devices, first show image and a tap instruction */
-      .login-overlay {
-        opacity: 0; /* Start hidden on mobile */
-        background-color: rgba(0, 0, 0, 0.65);
-      }
-      
-      /* Add tap instruction for mobile */
+      /* Show tap instruction for mobile */
       .mobile-tap-instruction {
         position: absolute;
         bottom: -40px;
@@ -378,8 +385,18 @@
         60% {transform: translateY(-5px);}
       }
       
-      .pulse-ring {
-        display: block; /* Show pulse ring on mobile */
+      /* Mobile form display mode */
+      .mobile-form-visible .login-overlay {
+        opacity: 1;
+        background-color: rgba(0, 0, 0, 0.8);
+      }
+      
+      .mobile-form-visible .bbop-image {
+        filter: blur(3px) brightness(0.7);
+      }
+      
+      .mobile-form-visible .mobile-tap-instruction {
+        display: none;
       }
       
       .header h1 {
@@ -408,13 +425,12 @@
         height: 500px;
       }
       
-      /* Mobile form is now shown after tapping */
-      .show-mobile-form .login-overlay {
-        opacity: 1;
+      .button-group {
+        flex-direction: column;
       }
       
-      .show-mobile-form .mobile-tap-instruction {
-        display: none;
+      .verification-container {
+        max-width: 320px;
       }
     }
     
@@ -426,19 +442,14 @@
       }
     }
     
-    /* Detect if device is touch-capable */
+    /* Touch device specific styles */
     @media (hover: none) {
-      .login-overlay {
-        opacity: 1;
-        background-color: rgba(0, 0, 0, 0.65);
+      .bbop-container:hover .login-overlay {
+        opacity: 0; /* Disable hover effect on touch devices */
       }
       
-      .bbop-image {
-        filter: blur(2px) brightness(0.8);
-      }
-      
-      .pulse-ring {
-        display: none;
+      .bbop-container:hover .bbop-image {
+        filter: none; /* Disable hover effect on touch devices */
       }
     }
   </style>
@@ -454,8 +465,12 @@
     <div id="login-section">
       <div class="bbop-container" id="bbop-container">
         <div class="pulse-ring"></div>
-        <!-- Use the crossorigin attribute to help with CORS issues -->
-        <img src="https://raw.githubusercontent.com/uqsmitc6/BBOP/refs/heads/main/BBOP_icon.jpg" alt="B-BOP Robot Avatar" class="bbop-image" crossorigin="anonymous" onerror="this.onerror=null; this.src='https://placehold.co/700x700/51247A/ffffff?text=B-BOP'">
+        <!-- Improved image loading with better fallback -->
+        <img src="https://raw.githubusercontent.com/uqsmitc6/BBOP/refs/heads/main/BBOP_icon.jpg" alt="B-BOP Robot Avatar" class="bbop-image" crossorigin="anonymous" onerror="this.style.display='none'; this.parentNode.querySelector('.bbop-image-fallback').style.display='flex';">
+        
+        <div class="bbop-image-fallback" style="display: none;">
+          <span class="robot-text">B-BOP</span>
+        </div>
         
         <div class="login-overlay" id="login-overlay">
           <div class="login-form">
@@ -471,6 +486,10 @@
               <span>Verifying...</span>
             </div>
           </div>
+        </div>
+        
+        <div class="mobile-tap-instruction">
+          Tap the icon to login
         </div>
       </div>
     </div>
@@ -521,12 +540,25 @@
       return ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (navigator.msMaxTouchPoints > 0);
     }
     
-    // If it's a touch device, ensure the form is visible
+    // Mobile-specific behavior
     if (isTouchDevice()) {
-      loginOverlay.style.opacity = '1';
-      document.querySelector('.bbop-image').style.filter = 'blur(2px) brightness(0.8)';
-      const pulseRing = document.querySelector('.pulse-ring');
-      if (pulseRing) pulseRing.style.display = 'none';
+      // Add click event for the BBOP container on mobile
+      bbopContainer.addEventListener('click', function(e) {
+        // Toggle mobile form visibility class
+        bbopContainer.classList.toggle('mobile-form-visible');
+        
+        // If the form is now visible, focus the input
+        if (bbopContainer.classList.contains('mobile-form-visible')) {
+          setTimeout(() => {
+            studentIdInput.focus();
+          }, 300);
+        }
+      });
+      
+      // Prevent form clicks from bubbling to container
+      loginOverlay.addEventListener('click', function(e) {
+        e.stopPropagation();
+      });
     }
     
     // Store verified student data
@@ -630,6 +662,8 @@
       loginSection.style.display = "block";
       // Clear the input field
       studentIdInput.value = "";
+      // Reset mobile form visibility
+      bbopContainer.classList.remove('mobile-form-visible');
     });
     
     // Function to launch the chatbot
