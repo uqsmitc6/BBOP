@@ -353,6 +353,36 @@
       padding: 0 20px;
     }
     
+    /* Alternative login button for mobile */
+    .mobile-login-button {
+      display: none;
+      margin-top: 20px;
+      width: 250px;
+      padding: 15px 20px;
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 30px;
+      font-size: 18px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      animation: pulse-button 2s infinite;
+    }
+    
+    @keyframes pulse-button {
+      0% {
+        box-shadow: 0 0 0 0 rgba(81, 36, 122, 0.7);
+      }
+      70% {
+        box-shadow: 0 0 0 10px rgba(81, 36, 122, 0);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(81, 36, 122, 0);
+      }
+    }
+    
     /* Mobile optimization */
     @media (max-width: 768px) {
       .bbop-container {
@@ -366,37 +396,51 @@
         font-size: 36px;
       }
       
-      /* Show tap instruction for mobile */
-      .mobile-tap-instruction {
-        position: absolute;
-        bottom: -40px;
-        left: 0;
-        right: 0;
-        text-align: center;
-        color: #aaa;
-        font-size: 16px;
-        animation: bounce 2s infinite;
+      /* Show mobile login button instead of tap instruction */
+      .mobile-login-button {
         display: block;
       }
       
-      @keyframes bounce {
-        0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
-        40% {transform: translateY(-10px);}
-        60% {transform: translateY(-5px);}
+      /* Hide the tap instruction since we're using a button */
+      .mobile-tap-instruction {
+        display: none;
       }
       
-      /* Mobile form display mode */
+      /* Always show login overlay when mobile-form-visible class is applied */
       .mobile-form-visible .login-overlay {
         opacity: 1;
         background-color: rgba(0, 0, 0, 0.8);
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1000;
+        border-radius: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
       }
       
       .mobile-form-visible .bbop-image {
         filter: blur(3px) brightness(0.7);
       }
       
-      .mobile-form-visible .mobile-tap-instruction {
-        display: none;
+      /* Add a close button for the mobile login overlay */
+      .close-overlay {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        width: 40px;
+        height: 40px;
+        background-color: rgba(0, 0, 0, 0.5);
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: white;
+        font-size: 24px;
+        cursor: pointer;
       }
       
       .header h1 {
@@ -419,6 +463,7 @@
       .login-form {
         width: 90%;
         padding: 20px;
+        max-width: 320px;
       }
       
       #chat-container {
@@ -473,6 +518,9 @@
         </div>
         
         <div class="login-overlay" id="login-overlay">
+          <!-- Add close button for mobile -->
+          <div class="close-overlay" id="close-overlay">×</div>
+          
           <div class="login-form">
             <h3 class="form-title">Enter Student ID</h3>
             <input type="text" id="studentIdInput" class="form-input" placeholder="e.g., s1234567" autocomplete="off">
@@ -487,11 +535,12 @@
             </div>
           </div>
         </div>
-        
-        <div class="mobile-tap-instruction">
-          Tap the icon to login
-        </div>
       </div>
+      
+      <!-- Dedicated login button for mobile -->
+      <button class="mobile-login-button" id="mobile-login-button">
+        Login to B-BOP
+      </button>
     </div>
     
     <!-- Verification Confirmation Section -->
@@ -534,30 +583,50 @@
     const chatContainer = document.getElementById('chat-container');
     const chatInterface = document.getElementById('chat-interface');
     const studentIdInput = document.getElementById('studentIdInput');
+    const mobileLoginButton = document.getElementById('mobile-login-button');
+    const closeOverlay = document.getElementById('close-overlay');
     
     // Function to detect touch capability
     function isTouchDevice() {
       return ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (navigator.msMaxTouchPoints > 0);
     }
     
-    // Mobile-specific behavior
+    // Function to show the login form
+    function showLoginForm() {
+      document.body.classList.add('mobile-form-visible');
+      bbopContainer.classList.add('mobile-form-visible');
+      
+      // Focus the input field
+      setTimeout(() => {
+        studentIdInput.focus();
+      }, 300);
+    }
+    
+    // Function to hide the login form
+    function hideLoginForm() {
+      document.body.classList.remove('mobile-form-visible');
+      bbopContainer.classList.remove('mobile-form-visible');
+    }
+    
+    // Set up appropriate event listeners
     if (isTouchDevice()) {
-      // Add click event for the BBOP container on mobile
-      bbopContainer.addEventListener('click', function(e) {
-        // Toggle mobile form visibility class
-        bbopContainer.classList.toggle('mobile-form-visible');
-        
-        // If the form is now visible, focus the input
-        if (bbopContainer.classList.contains('mobile-form-visible')) {
-          setTimeout(() => {
-            studentIdInput.focus();
-          }, 300);
-        }
+      // Mobile login button shows the form
+      mobileLoginButton.addEventListener('click', showLoginForm);
+      
+      // Close button hides the form
+      closeOverlay.addEventListener('click', function(e) {
+        e.stopPropagation();
+        hideLoginForm();
       });
       
       // Prevent form clicks from bubbling to container
       loginOverlay.addEventListener('click', function(e) {
         e.stopPropagation();
+      });
+    } else {
+      // Desktop/non-touch behavior - clicking the avatar still works
+      bbopContainer.addEventListener('click', function() {
+        showLoginForm();
       });
     }
     
@@ -576,7 +645,7 @@
     
     // Verification function
     async function verifyStudentId() {
-      const studentId = studentIdInput.value.trim();
+      let studentId = studentIdInput.value.trim();
       errorMsg.textContent = ""; // clear previous errors
       
       if (!studentId) {
@@ -592,6 +661,13 @@
       if (!studentIdRegex.test(studentId) && !staffIdRegex.test(studentId)) {
         errorMsg.textContent = "Please enter a valid student ID in the format sXXXXXXX";
         return;
+      }
+      
+      // Normalize the case for student and staff IDs (even though we fixed it on the server)
+      if (studentId.toLowerCase().startsWith('s')) {
+        studentId = studentId.toLowerCase();
+      } else if (studentId.toLowerCase().startsWith('uq')) {
+        studentId = studentId.toLowerCase();
       }
       
       // Show loading message
@@ -620,6 +696,9 @@
         if (result.valid) {
           // Store the verified student data
           verifiedStudent = result;
+          
+          // Hide login form
+          hideLoginForm();
           
           // Show the confirmation section
           loginSection.style.display = "none";
@@ -663,7 +742,7 @@
       // Clear the input field
       studentIdInput.value = "";
       // Reset mobile form visibility
-      bbopContainer.classList.remove('mobile-form-visible');
+      hideLoginForm();
     });
     
     // Function to launch the chatbot
