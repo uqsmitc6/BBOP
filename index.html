@@ -323,24 +323,44 @@
         width: 100%;
         max-width: 350px;
         height: 350px;
+        position: relative;
       }
       
-      /* For mobile devices, show the login form by default */
+      /* For mobile devices, first show image and a tap instruction */
       .login-overlay {
-        opacity: 1;
+        opacity: 0; /* Start hidden on mobile */
         background-color: rgba(0, 0, 0, 0.65);
       }
       
       .bbop-image {
-        filter: blur(2px) brightness(0.8);
-        object-fit: contain; /* Changed from cover to contain */
+        filter: none; /* No blur initially */
+        object-fit: contain;
         width: 100%;
         height: 100%;
         border-radius: 50%;
       }
       
+      /* Add tap instruction for mobile */
+      .mobile-tap-instruction {
+        position: absolute;
+        bottom: -40px;
+        left: 0;
+        right: 0;
+        text-align: center;
+        color: #aaa;
+        font-size: 16px;
+        animation: bounce 2s infinite;
+        display: block;
+      }
+      
+      @keyframes bounce {
+        0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+        40% {transform: translateY(-10px);}
+        60% {transform: translateY(-5px);}
+      }
+      
       .pulse-ring {
-        display: none; /* No need for pulse on mobile since form is always visible */
+        display: block; /* Show pulse ring on mobile */
       }
       
       .header h1 {
@@ -367,6 +387,19 @@
       
       #chat-container {
         height: 500px;
+      }
+      
+      /* Mobile form is now shown after tapping */
+      .show-mobile-form .login-overlay {
+        opacity: 1;
+      }
+      
+      .show-mobile-form .bbop-image {
+        filter: blur(2px) brightness(0.8);
+      }
+      
+      .show-mobile-form .mobile-tap-instruction {
+        display: none;
       }
     }
     
