@@ -1,215 +1,607 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>B-BOP - Your Academic Assistant</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>B-BOP | MGTS2603 AI Assistant</title>
+  <style>
+    :root {
+      --primary-color: #51247A;
+      --primary-light: #6a359c;
+      --secondary-color: #DAAA00;
+      --dark-color: #121212;
+      --light-text: #f5f5f5;
+      --border-radius: 12px;
+      --transition: all 0.3s ease;
+    }
     
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
     
-    <style>
-        /* Custom Properties */
-        :root {
-            --color-bg: #111827;
-            --color-text: #E5E7EB;
-            --color-accent: #F59E0B;
-            --color-secondary: #374151;
-        }
-
-        /* Base Styles */
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: var(--color-bg);
-            color: var(--color-text);
-            font-family: 'Courier Prime', monospace;
-            line-height: 1.6;
-        }
-
-        /* Layout */
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem 1rem;
-        }
-
-        /* Hero Section */
-        .hero {
-            text-align: center;
-            padding: 4rem 1rem;
-            position: relative;
-        }
-
-        /* Background Pattern */
-        .bg-pattern {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0.05;
-            pointer-events: none;
-            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-        }
-
-        /* B-BOP Image Container */
-        .bbop-container {
-            width: 300px;
-            height: 300px;
-            margin: 0 auto 2rem;
-            border-radius: 50%;
-            padding: 0;
-            background: var(--color-secondary);
-            border: 4px solid rgba(245, 158, 11, 0.3);
-            transition: border-color 0.3s ease;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .bbop-container:hover {
-            border-color: rgba(245, 158, 11, 0.5);
-        }
-
-        .bbop-image {
-            width: 120%;
-            height: 120%;
-            object-fit: cover;
-            object-position: center;
-        }
-
-        /* Typography */
-        h1 {
-            font-family: 'Playfair Display', serif;
-            font-size: 3rem;
-            color: #FCD34D;
-            margin-bottom: 1.5rem;
-        }
-
-        .subtitle {
-            font-size: 1.25rem;
-            color: #9CA3AF;
-            margin-bottom: 2rem;
-        }
-
-        /* Information Box */
-        .info-box {
-            max-width: 800px;
-            margin: 2rem auto;
-            padding: 2rem;
-            border: 1px solid var(--color-secondary);
-            background-color: rgba(55, 65, 81, 0.5);
-        }
-
-        .info-box h2 {
-            font-family: 'Playfair Display', serif;
-            color: #FCD34D;
-            margin-bottom: 1rem;
-        }
-
-        .info-box ul {
-            text-align: left;
-            padding-left: 1.5rem;
-        }
-
-        /* Chat Container */
-        .chat-container {
-            max-width: 800px;
-            margin: 2rem auto;
-            padding: 2rem;
-            background-color: rgba(55, 65, 81, 0.5);
-            border: 1px solid var(--color-secondary);
-        }
-
-        .chat-container h2 {
-            font-family: 'Playfair Display', serif;
-            color: #FCD34D;
-            text-align: center;
-            margin-bottom: 1.5rem;
-        }
-
-        /* Zapier Chat Wrapper */
-        .chat-wrapper {
-            position: relative;
-            background-color: rgba(17, 24, 39, 0.8);
-            padding: 1rem;
-            border: 1px solid var(--color-secondary);
-            width: 100%;
-            max-width: 800px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: center;
-        }
-
-        /* Gradient Overlays */
-        .gradient-top, .gradient-bottom {
-            position: absolute;
-            left: 0;
-            right: 0;
-            height: 1rem;
-            pointer-events: none;
-        }
-
-        .gradient-top {
-            top: 0;
-            background: linear-gradient(to bottom, rgba(245, 158, 11, 0.1), transparent);
-        }
-
-        .gradient-bottom {
-            bottom: 0;
-            background: linear-gradient(to top, rgba(245, 158, 11, 0.1), transparent);
-        }
-    </style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--dark-color);
+      color: var(--light-text);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      overflow-x: hidden;
+    }
+    
+    .main-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      max-width: 1400px;
+      width: 100%;
+    }
+    
+    .header {
+      margin-bottom: 30px;
+      text-align: center;
+    }
+    
+    .header h1 {
+      font-size: 48px;
+      color: var(--light-text);
+      margin-bottom: 5px;
+      text-shadow: 0 0 10px rgba(81, 36, 122, 0.6);
+    }
+    
+    .header p {
+      color: #aaa;
+      font-size: 20px;
+    }
+    
+    /* BBOP Image and Login Container */
+    .bbop-container {
+      position: relative;
+      width: 700px;
+      height: 700px;
+      margin: 0 auto;
+      border-radius: 50%;
+      overflow: hidden;
+      cursor: pointer;
+      box-shadow: 0 0 50px rgba(81, 36, 122, 0.4);
+    }
+    
+    .bbop-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: var(--transition);
+      border-radius: 50%;
+      border: 8px solid var(--primary-color);
+    }
+    
+    .login-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      transition: var(--transition);
+      border-radius: 50%;
+      padding: 40px;
+      color: white;
+    }
+    
+    .bbop-container:hover .bbop-image {
+      filter: blur(3px) brightness(0.7);
+    }
+    
+    .bbop-container:hover .login-overlay {
+      opacity: 1;
+    }
+    
+    /* Pulsing animation for the avatar container */
+    .pulse-ring {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      border-radius: 50%;
+      border: 3px solid rgba(81, 36, 122, 0.5);
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0% {
+        transform: scale(1);
+        opacity: 1;
+      }
+      70% {
+        transform: scale(1.05);
+        opacity: 0;
+      }
+      100% {
+        transform: scale(1);
+        opacity: 0;
+      }
+    }
+    
+    .login-form {
+      width: 80%;
+      max-width: 400px;
+      text-align: center;
+      background-color: rgba(0, 0, 0, 0.6);
+      padding: 30px;
+      border-radius: 20px;
+      backdrop-filter: blur(5px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .form-title {
+      margin-bottom: 20px;
+      font-size: 28px;
+      color: white;
+      text-shadow: 0 0 10px rgba(81, 36, 122, 0.8);
+    }
+    
+    .form-input {
+      width: 100%;
+      padding: 15px 20px;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+      background-color: rgba(255, 255, 255, 0.1);
+      color: white;
+      font-size: 18px;
+      margin-bottom: 20px;
+      transition: var(--transition);
+    }
+    
+    .form-input::placeholder {
+      color: rgba(255, 255, 255, 0.6);
+    }
+    
+    .form-input:focus {
+      outline: none;
+      border-color: var(--secondary-color);
+      background-color: rgba(255, 255, 255, 0.15);
+    }
+    
+    .btn {
+      width: 100%;
+      padding: 15px 0;
+      border: none;
+      border-radius: 10px;
+      background-color: var(--primary-color);
+      color: white;
+      font-size: 18px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    
+    .btn:hover {
+      background-color: var(--primary-light);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    }
+    
+    .id-hint {
+      margin-top: 15px;
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.7);
+    }
+    
+    /* Error and loading states */
+    #error-msg {
+      color: #ff6b6b;
+      margin-top: 15px;
+      font-size: 14px;
+    }
+    
+    #loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 15px;
+      color: white;
+    }
+    
+    .loading-spinner {
+      border: 3px solid rgba(255, 255, 255, 0.2);
+      border-top: 3px solid white;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      animation: spin 1s linear infinite;
+      margin-right: 10px;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    /* Verification confirmation */
+    .verification-container {
+      max-width: 450px;
+      width: 90%;
+      background-color: rgba(20, 20, 20, 0.9);
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 5px 30px rgba(0, 0, 0, 0.3);
+      text-align: center;
+      border-top: 5px solid var(--primary-color);
+    }
+    
+    #success-msg {
+      color: #4caf50;
+      font-size: 22px;
+      margin-bottom: 25px;
+    }
+    
+    .button-group {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .btn-secondary {
+      background-color: #333;
+      color: white;
+    }
+    
+    .btn-secondary:hover {
+      background-color: #444;
+    }
+    
+    .btn-danger {
+      background-color: #f44336;
+    }
+    
+    .btn-danger:hover {
+      background-color: #e53935;
+    }
+    
+    /* Chat interface */
+    .chat-interface {
+      width: 100%;
+      max-width: 900px;
+    }
+    
+    .student-info {
+      background-color: rgba(30, 30, 30, 0.9);
+      padding: 15px 20px;
+      border-radius: 12px;
+      margin-bottom: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+    
+    .student-name {
+      font-weight: 600;
+      color: var(--light-text);
+    }
+    
+    .student-id {
+      font-family: monospace;
+      background-color: rgba(255, 255, 255, 0.1);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 14px;
+      color: #ccc;
+    }
+    
+    #chat-container {
+      width: 100%;
+      height: 600px;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 5px 30px rgba(0, 0, 0, 0.2);
+      background-color: rgba(20, 20, 20, 0.9);
+    }
+    
+    .disclaimer {
+      max-width: 800px;
+      margin-top: 40px;
+      text-align: center;
+      font-size: 14px;
+      color: #888;
+      line-height: 1.6;
+      padding: 0 20px;
+    }
+    
+    /* Mobile optimization */
+    @media (max-width: 768px) {
+      .bbop-container {
+        width: 100%;
+        max-width: 350px;
+        height: 350px;
+      }
+      
+      /* For mobile devices, show the login form by default */
+      .login-overlay {
+        opacity: 1;
+        background-color: rgba(0, 0, 0, 0.65);
+      }
+      
+      .bbop-image {
+        filter: blur(2px) brightness(0.8);
+      }
+      
+      .pulse-ring {
+        display: none; /* No need for pulse on mobile since form is always visible */
+      }
+      
+      .header h1 {
+        font-size: 32px;
+      }
+      
+      .header p {
+        font-size: 16px;
+      }
+      
+      .form-title {
+        font-size: 22px;
+      }
+      
+      .form-input, .btn {
+        padding: 12px;
+        font-size: 16px;
+      }
+      
+      .login-form {
+        width: 90%;
+        padding: 20px;
+      }
+      
+      #chat-container {
+        height: 500px;
+      }
+    }
+    
+    /* Tablet optimization */
+    @media (min-width: 769px) and (max-width: 1024px) {
+      .bbop-container {
+        width: 500px;
+        height: 500px;
+      }
+    }
+    
+    /* Detect if device is touch-capable */
+    @media (hover: none) {
+      .login-overlay {
+        opacity: 1;
+        background-color: rgba(0, 0, 0, 0.65);
+      }
+      
+      .bbop-image {
+        filter: blur(2px) brightness(0.8);
+      }
+      
+      .pulse-ring {
+        display: none;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="bg-pattern"></div>
-    
-    <div class="container">
-        <main class="hero">
-            <div class="bbop-container">
-               <img src="BBOP_icon.jpg" alt="B-BOP, your scholarly robot companion" class="bbop-image">
-            </div>
-
-            <h1>Hi, I'm B-BOP</h1>
-            <p class="subtitle">Your study partner for Leading and Managing People (MGTS2603)</p>
-
-            <div class="info-box">
-                <h2>I'm here to:</h2>
-                <ul>
-                    <li>Help you understand complex leadership concepts</li>
-                    <li>Test your knowledge through discussions</li>
-                    <li>Guide you in connecting theories to real-world practice</li>
-                </ul>
-            </div>
-
-            <div class="info-box">
-                <h2>For effective learning conversations:</h2>
-                <ul>
-                    <li>Review your weekly Blackboard materials first</li>
-                    <li>Come with your questions and thoughts</li>
-                    <li>Use our discussions to deepen your understanding</li>
-                </ul>
-            </div>
-
-            <div class="chat-container">
-                <h2>Start a Conversation</h2>
-                <div class="chat-wrapper">
-                    <div class="gradient-top"></div>
-                    <iframe 
-                        src='https://interfaces.zapier.com/embed/chatbot/cm6g1x781001m1fs6d6i4c3j1' 
-                        height='600px' 
-                        width='100%' 
-                        allow='clipboard-write *' 
-                        style="border: none; max-width: 700px;"
-                    ></iframe>
-                    <div class="gradient-bottom"></div>
-                </div>
-            </div>
-        </main>
+  <div class="main-container">
+    <div class="header">
+      <h1>B-BOP</h1>
+      <p>MGTS2603 AI Assistant</p>
     </div>
+    
+    <!-- Main BBOP avatar with login overlay -->
+    <div id="login-section">
+      <div class="bbop-container" id="bbop-container">
+        <div class="pulse-ring"></div>
+        <img src="https://raw.githubusercontent.com/uqsmitc6/BBOP/refs/heads/main/BBOP_icon.jpg" alt="B-BOP Robot Avatar" class="bbop-image">
+        
+        <div class="login-overlay" id="login-overlay">
+          <div class="login-form">
+            <h3 class="form-title">Enter Student ID</h3>
+            <input type="text" id="studentIdInput" class="form-input" placeholder="e.g., s1234567" autocomplete="off">
+            <button class="btn" id="verifyBtn">Verify ID</button>
+            
+            <p class="id-hint">Please enter your UQ student ID in the format sXXXXXXX</p>
+            <p id="error-msg"></p>
+            
+            <div id="loading" style="display: none;">
+              <div class="loading-spinner"></div>
+              <span>Verifying...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Verification Confirmation Section -->
+    <div id="verification-container" style="display: none;" class="verification-container">
+      <p id="success-msg"></p>
+      
+      <div class="button-group">
+        <button class="btn" id="confirmBtn">Yes, that's me</button>
+        <button class="btn btn-danger" id="cancelBtn">No, that's not me</button>
+      </div>
+    </div>
+    
+    <!-- Chat Interface -->
+    <div id="chat-interface" style="display: none;" class="chat-interface">
+      <div class="student-info">
+        <span class="student-name" id="student-name-display"></span>
+        <span class="student-id" id="student-id-display"></span>
+      </div>
+      
+      <div id="chat-container"></div>
+    </div>
+    
+    <div class="disclaimer">
+      <p>B-BOP is an AI assistant designed to support MGTS2603 students. While it provides guidance based on course materials, always verify important information with your course coordinator or tutor. B-BOP adheres to the course AI usage guidelines as outlined in the assessment criteria.</p>
+    </div>
+  </div>
+  
+  <script>
+    // Get DOM elements
+    const bbopContainer = document.getElementById('bbop-container');
+    const loginOverlay = document.getElementById('login-overlay');
+    const verifyBtn = document.getElementById('verifyBtn');
+    const confirmBtn = document.getElementById('confirmBtn');
+    const cancelBtn = document.getElementById('cancelBtn');
+    const loginSection = document.getElementById('login-section');
+    const verificationContainer = document.getElementById('verification-container');
+    const errorMsg = document.getElementById('error-msg');
+    const successMsg = document.getElementById('success-msg');
+    const loadingMsg = document.getElementById('loading');
+    const chatContainer = document.getElementById('chat-container');
+    const chatInterface = document.getElementById('chat-interface');
+    const studentIdInput = document.getElementById('studentIdInput');
+    
+    // Function to detect touch capability
+    function isTouchDevice() {
+      return ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (navigator.msMaxTouchPoints > 0);
+    }
+    
+    // If it's a touch device, ensure the form is visible
+    if (isTouchDevice()) {
+      loginOverlay.style.opacity = '1';
+      document.querySelector('.bbop-image').style.filter = 'blur(2px) brightness(0.8)';
+      const pulseRing = document.querySelector('.pulse-ring');
+      if (pulseRing) pulseRing.style.display = 'none';
+    }
+    
+    // Store verified student data
+    let verifiedStudent = null;
+    
+    // Add event listener for the verify button
+    verifyBtn.addEventListener('click', verifyStudentId);
+    
+    // Also verify when pressing Enter in the input field
+    studentIdInput.addEventListener('keypress', function(event) {
+      if (event.key === 'Enter') {
+        verifyStudentId();
+      }
+    });
+    
+    // Verification function
+    async function verifyStudentId() {
+      const studentId = studentIdInput.value.trim();
+      errorMsg.textContent = ""; // clear previous errors
+      
+      if (!studentId) {
+        errorMsg.textContent = "Please enter a student ID";
+        return;
+      }
+      
+      // Basic format validation for students and secret support for staff
+      const studentIdRegex = /^s\d{7}$/i;
+      const staffIdRegex = /^uq[a-z0-9]{6}$/i;
+      
+      // Allow both student and staff IDs to pass, but only show error for student format
+      if (!studentIdRegex.test(studentId) && !staffIdRegex.test(studentId)) {
+        errorMsg.textContent = "Please enter a valid student ID in the format sXXXXXXX";
+        return;
+      }
+      
+      // Show loading message
+      loadingMsg.style.display = "flex";
+      
+      try {
+        // Call the Google Apps Script to verify the ID
+        const apiUrl = 'https://script.google.com/macros/s/AKfycbwq1JqJUl6R6dHbuyl9nDJH5gSdIXuPosw-YOU6RT4zi-sdbU3kNndlEcCv6Scw3zDJ/exec';
+        console.log("Verifying student ID:", studentId);
+        
+        const response = await fetch(`${apiUrl}?id=${encodeURIComponent(studentId)}`);
+        console.log("Response status:", response.status);
+        
+        // Hide loading message
+        loadingMsg.style.display = "none";
+        
+        if (!response.ok) {
+          throw new Error(`Server error: ${response.status}`);
+        }
+        
+        // Parse the response
+        const result = await response.json();
+        console.log("Verification result:", result);
+        
+        // Check if the ID was found
+        if (result.valid) {
+          // Store the verified student data
+          verifiedStudent = result;
+          
+          // Show the confirmation section
+          loginSection.style.display = "none";
+          verificationContainer.style.display = "block";
+          successMsg.textContent = `Hello, ${result.name}! Is this correct?`;
+        } else {
+          // ID not found
+          errorMsg.textContent = "Student ID not found. Please check your ID or contact your course coordinator.";
+        }
+      } catch (err) {
+        // Hide loading message
+        loadingMsg.style.display = "none";
+        console.error("Verification error:", err);
+        errorMsg.textContent = "Error verifying ID. Please try again later.";
+      }
+    }
+    
+    // Add event listener for the confirm button
+    confirmBtn.addEventListener('click', () => {
+      if (verifiedStudent) {
+        // Hide the verification section
+        verificationContainer.style.display = "none";
+        
+        // Update student info display in the header bar
+        document.getElementById('student-name-display').textContent = verifiedStudent.name;
+        document.getElementById('student-id-display').textContent = verifiedStudent.id;
+        
+        // Show the chat interface
+        chatInterface.style.display = "block";
+        
+        // Launch the chatbot with the verified student data
+        launchChatbot(verifiedStudent);
+      }
+    });
+    
+    // Add event listener for the cancel button
+    cancelBtn.addEventListener('click', () => {
+      // Go back to the login section
+      verificationContainer.style.display = "none";
+      loginSection.style.display = "block";
+      // Clear the input field
+      studentIdInput.value = "";
+    });
+    
+    // Function to launch the chatbot
+    function launchChatbot(studentData) {
+      // Prepare the chatbot URL
+      let chatbotUrl = "https://interfaces.zapier.com/embed/chatbot/cm6g1x781001m1fs6d6i4c3j1";
+      
+      // Use the parameters that work
+      chatbotUrl += `?studentId=${encodeURIComponent(studentData.id)}`;
+      chatbotUrl += `&studentName=${encodeURIComponent(studentData.name)}`;
+      
+      console.log("Loading chatbot with URL:", chatbotUrl);
+      
+      // Create an iframe to embed the chatbot
+      const iframe = document.createElement('iframe');
+      iframe.src = chatbotUrl;
+      iframe.width = "100%";
+      iframe.height = "100%";
+      iframe.style.border = "none";
+      iframe.setAttribute('allow', 'clipboard-write *');
+      
+      // Add the iframe to the chatbot container
+      chatContainer.innerHTML = "";
+      chatContainer.appendChild(iframe);
+    }
+  </script>
 </body>
 </html>
