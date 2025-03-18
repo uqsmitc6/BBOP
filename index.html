@@ -609,7 +609,7 @@
       
       try {
         // Call the Google Apps Script to verify the ID
-        const apiUrl = 'https://script.google.com/macros/s/AKfycbwq1JqJUl6R6dHbuyl9nDJH5gSdIXuPosw-YOU6RT4zi-sdbU3kNndlEcCv6Scw3zDJ/exec';
+        const apiUrl = 'https://script.google.com/macros/s/AKfycbzestJvZt4tdl_a0Ka2I8u4wkM4rrEH3rqeyLQle_dhlXFpDaGgm_RpK11fGZbtw0T0/exec';
         console.log("Verifying student ID:", studentId);
         
         const response = await fetch(`${apiUrl}?id=${encodeURIComponent(studentId)}`);
