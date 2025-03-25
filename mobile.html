@@ -537,6 +537,7 @@
       z-index: 1001; /* Ensure it's above the overlay */
     }
     
+    // Mobile tap instruction - changed to be clearer
     .mobile-tap-instruction {
       display: none;
       text-align: center;
@@ -562,15 +563,26 @@
       .bbop-container {
         width: 300px;
         height: 300px;
+        cursor: default; /* Remove pointer cursor on mobile */
       }
       
       .robot-text {
         font-size: 28px;
       }
       
+      /* Disable hover effects on mobile */
+      .bbop-container:hover .bbop-image {
+        filter: none;
+      }
+      
+      .bbop-container:hover .login-overlay {
+        opacity: 0; /* Keep overlay hidden even on hover for mobile */
+      }
+      
+      /* Only show login overlay when the mobile-form-visible class is applied */
       .login-overlay {
         opacity: 0;
-        border-radius: 50%;
+        border-radius: 0;
         padding: 20px;
       }
       
@@ -609,8 +621,23 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background-color: rgba(0, 0, 0, 0.8);
+        background-color: rgba(0, 0, 0, 0.95);
         z-index: 999;
+      }
+      
+      /* Make the login form better on mobile */
+      .login-form {
+        background-color: rgba(18, 18, 18, 0.95);
+        border: 1px solid var(--primary-color);
+      }
+      
+      /* Adjust the form to be better positioned on mobile */
+      .bbop-container.mobile-form-visible .login-form {
+        position: relative;
+        top: -10px;
+        width: 90%;
+        max-width: 350px;
+        margin: 0 auto;
       }
       
       .verification-container {
@@ -865,24 +892,27 @@
       }, 2000);
     }
     
-    // Setup event listeners for both desktop and mobile experiences
-    // For all devices - clicking the avatar shows the login form
-    bbopContainer.addEventListener('click', function() {
-      showLoginForm();
-    });
+    // Setup event listeners - differently for mobile and desktop
+    if (isTouchDevice()) {
+      // For mobile devices, only the login button shows the form
+      // Disable the bbop container click on mobile
+      mobileLoginButton.addEventListener('click', function() {
+        showLoginForm();
+      });
+    } else {
+      // Desktop behavior - clicking the avatar shows login overlay
+      bbopContainer.addEventListener('click', function() {
+        showLoginForm();
+      });
+    }
     
-    // Mobile login button shows the form
-    mobileLoginButton.addEventListener('click', function() {
-      showLoginForm();
-    });
-    
-    // Close button hides the form
+    // Close button hides the form (on all devices)
     closeOverlay.addEventListener('click', function(e) {
       e.stopPropagation();
       hideLoginForm();
     });
     
-    // Prevent form clicks from bubbling to container
+    // Prevent form clicks from bubbling to container (on all devices)
     loginOverlay.addEventListener('click', function(e) {
       e.stopPropagation();
     });
@@ -910,20 +940,17 @@
         return;
       }
       
-      // Basic format validation for students and special support for staff (uqsmitc6)
+      // Basic format validation for students and secret support for staff
       const studentIdRegex = /^s\d{7}$/i;
       const staffIdRegex = /^uq[a-z0-9]{6}$/i;
       
-      // Special case for demo (to ensure testing works)
-      if (studentId.toLowerCase() === 'uqsmitc6') {
-        console.log("Special staff ID detected!");
-        // Skip validation for this specific ID
-      } else if (!studentIdRegex.test(studentId) && !staffIdRegex.test(studentId)) {
+      // Allow both student and staff IDs to pass, but only show error for student format
+      if (!studentIdRegex.test(studentId) && !staffIdRegex.test(studentId)) {
         errorMsg.textContent = "Please enter a valid student ID in the format sXXXXXXX";
         return;
       }
       
-      // Normalize the case for student and staff IDs
+      // Normalize the case for student and staff IDs (even though we fixed it on the server)
       if (studentId.toLowerCase().startsWith('s')) {
         studentId = studentId.toLowerCase();
       } else if (studentId.toLowerCase().startsWith('uq')) {
@@ -934,38 +961,7 @@
       loadingMsg.style.display = "flex";
       
       try {
-        // Special case for testing with uqsmitc6
-        if (studentId.toLowerCase() === 'uqsmitc6') {
-          console.log("DEMO MODE: Using special staff verification");
-          
-          // Short delay for UI feedback
-          await new Promise(resolve => setTimeout(resolve, 800));
-          
-          // Create a staff result
-          const staffResult = {
-            valid: true,
-            id: 'uqsmitc6',
-            name: "Chris Smith"
-          };
-          
-          // Hide loading message
-          loadingMsg.style.display = "none";
-          
-          // Store the staff data
-          verifiedStudent = staffResult;
-          
-          // Hide login form
-          hideLoginForm();
-          
-          // Show the confirmation section
-          loginSection.style.display = "none";
-          verificationContainer.style.display = "block";
-          successMsg.textContent = `Hello, ${staffResult.name}! Is this correct?`;
-          
-          return;
-        }
-        
-        // For all other IDs, call the Google Apps Script to verify
+        // Call the Google Apps Script to verify the ID for all users
         const apiUrl = 'https://script.google.com/macros/s/AKfycbzestJvZt4tdl_a0Ka2I8u4wkM4rrEH3rqeyLQle_dhlXFpDaGgm_RpK11fGZbtw0T0/exec';
         console.log("Verifying student ID:", studentId);
         
