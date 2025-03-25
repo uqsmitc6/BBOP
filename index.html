@@ -341,6 +341,16 @@
       overflow: hidden;
       box-shadow: 0 5px 30px rgba(0, 0, 0, 0.2);
       background-color: rgba(20, 20, 20, 0.9);
+      flex-grow: 1;
+    }
+    
+    /* Solution for the iframe size issue */
+    .chat-interface {
+      display: flex;
+      flex-direction: column;
+      height: calc(100vh - 250px);
+      min-height: 700px;
+      margin-bottom: 60px; /* Add space between chat interface and disclaimer */
     }
     
     .disclaimer {
@@ -351,6 +361,8 @@
       color: #888;
       line-height: 1.6;
       padding: 0 20px;
+      margin-bottom: 20px;
+      clear: both;
     }
     
     /* Alternative login button for mobile */
@@ -381,6 +393,129 @@
       100% {
         box-shadow: 0 0 0 0 rgba(81, 36, 122, 0);
       }
+    }
+    
+    /* BBOP Introduction styles */
+    .bbop-intro-panel {
+      background-color: rgba(30, 30, 30, 0.95);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 15px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      border-left: 4px solid var(--secondary-color);
+      max-height: calc(250px + 320px);
+      overflow-y: auto;
+    }
+    
+    .bbop-intro-panel h3 {
+      color: var(--secondary-color);
+      margin-bottom: 10px;
+      font-size: 22px;
+    }
+    
+    .bbop-intro-panel p {
+      color: #ddd;
+      line-height: 1.5;
+      margin-bottom: 15px;
+    }
+    
+    .bbop-capabilities ul {
+      color: #ddd;
+      margin-left: 25px;
+      margin-bottom: 15px;
+    }
+    
+    .bbop-capabilities li {
+      margin-bottom: 5px;
+    }
+    
+    .feedback-note {
+      font-style: italic;
+      font-size: 14px;
+      color: #bbb;
+      border-left: 3px solid var(--secondary-color);
+      padding-left: 10px;
+      margin-top: 10px;
+    }
+    
+    .prompt-suggestions h4 {
+      font-size: 18px;
+      color: var(--light-text);
+      margin-bottom: 12px;
+      font-weight: 500;
+    }
+    
+    .prompt-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 15px;
+      max-height: 320px;
+      overflow-y: auto;
+      padding-right: 5px;
+    }
+    
+    .prompt-card {
+      background-color: rgba(81, 36, 122, 0.2);
+      border: 1px solid rgba(81, 36, 122, 0.5);
+      border-radius: 8px;
+      padding: 15px;
+      transition: all 0.2s ease;
+      position: relative;
+      cursor: pointer;
+    }
+    
+    .prompt-card:hover {
+      background-color: rgba(81, 36, 122, 0.3);
+      transform: translateY(-2px);
+    }
+    
+    .prompt-card p {
+      color: #eee;
+      font-size: 14px;
+      margin: 0;
+      padding-right: 30px;
+    }
+    
+    .copy-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background-color: rgba(218, 170, 0, 0.6);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 4px 8px;
+      font-size: 12px;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+    
+    .prompt-card:hover .copy-btn {
+      opacity: 1;
+    }
+    
+    .copy-btn:hover {
+      background-color: rgba(218, 170, 0, 0.9);
+    }
+    
+    /* Toast notification for copy success */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: rgba(0, 0, 0, 0.7);
+      color: white;
+      padding: 10px 20px;
+      border-radius: 4px;
+      z-index: 1000;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    
+    .toast.show {
+      opacity: 1;
     }
     
     /* Mobile optimization */
@@ -477,6 +612,25 @@
       .verification-container {
         max-width: 320px;
       }
+      
+      .prompt-cards {
+        grid-template-columns: 1fr;
+        max-height: 380px;
+      }
+      
+      .bbop-intro-panel {
+        padding: 15px;
+        max-height: none;
+      }
+      
+      .chat-interface {
+        height: auto;
+        min-height: auto;
+      }
+      
+      #chat-container {
+        height: 500px;
+      }
     }
     
     /* Tablet optimization */
@@ -560,6 +714,54 @@
         <span class="student-id" id="student-id-display"></span>
       </div>
       
+      <!-- B-BOP Introduction Panel -->
+      <div id="bbop-introduction" class="bbop-intro-panel">
+        <h3>Welcome to B-BOP: Leadership Course Assistant for MGTS2603</h3>
+        <p>B-BOP is designed to help you understand leadership concepts, clarify assessment requirements, and provide guidance throughout your Leading and Managing People course.</p>
+        
+        <div class="bbop-capabilities">
+          <p><strong>B-BOP can:</strong></p>
+          <ul>
+            <li>Validate leader choices for Assessment 2</li>
+            <li>Explain leadership theories and concepts</li>
+            <li>Provide information about submission deadlines</li>
+            <li>Create practice quizzes for review</li>
+            <li>Offer general reflection guidance</li>
+          </ul>
+          <p class="feedback-note">This is a new tool that's still being refined. Your feedback on your experience with B-BOP will help improve it for all students. Please share any suggestions with your teaching team.</p>
+        </div>
+        
+        <div class="prompt-suggestions">
+          <h4>Try asking me:</h4>
+          <div class="prompt-cards">
+            <div class="prompt-card" onclick="copyPrompt(this)">
+              <p>Would [leader name] be an appropriate choice for my Assessment 2 case study? I'm considering [specific leader].</p>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <div class="prompt-card" onclick="copyPrompt(this)">
+              <p>Can you explain the difference between transformational and transactional leadership theories?</p>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <div class="prompt-card" onclick="copyPrompt(this)">
+              <p>What are the submission deadlines and requirements for Assessment 1 (weekly reflection journals)?</p>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <div class="prompt-card" onclick="copyPrompt(this)">
+              <p>Could you quiz me on leadership theories with both recall and critical thinking questions?</p>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <div class="prompt-card" onclick="copyPrompt(this)">
+              <p>I need to reflect on team dynamics for this week's journal. What general questions should I consider about communication patterns and leadership styles?</p>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <div class="prompt-card" onclick="copyPrompt(this)">
+              <p>I'm planning to use [theory name] for my Assessment 2 analysis of [leader name]. Can you confirm if this theory is covered in our course and explain how it might be relevant to leadership analysis?</p>
+              <button class="copy-btn">Copy</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
       <div id="chat-container"></div>
     </div>
     
@@ -606,6 +808,44 @@
     function hideLoginForm() {
       document.body.classList.remove('mobile-form-visible');
       bbopContainer.classList.remove('mobile-form-visible');
+    }
+    
+    // Function to copy prompt text to clipboard
+    function copyPrompt(element) {
+      const promptText = element.querySelector('p').textContent;
+      navigator.clipboard.writeText(promptText).then(() => {
+        // Show toast notification
+        showToast('Prompt copied to clipboard!');
+        
+        // Highlight the copied card
+        element.style.backgroundColor = 'rgba(81, 36, 122, 0.4)';
+        setTimeout(() => {
+          element.style.backgroundColor = '';
+        }, 1000);
+      }).catch(err => {
+        console.error('Failed to copy text: ', err);
+      });
+    }
+    
+    // Function to show toast notification
+    function showToast(message) {
+      // Create toast if it doesn't exist
+      let toast = document.getElementById('copy-toast');
+      if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'copy-toast';
+        toast.className = 'toast';
+        document.body.appendChild(toast);
+      }
+      
+      // Set message and show
+      toast.textContent = message;
+      toast.classList.add('show');
+      
+      // Hide after 2 seconds
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2000);
     }
     
     // Set up appropriate event listeners
