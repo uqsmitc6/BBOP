@@ -33,6 +33,15 @@
       overflow-x: hidden;
     }
     
+    /* Mobile-specific body class */
+    body.is-mobile .bbop-container .login-overlay {
+      opacity: 1 !important;
+    }
+    
+    body.is-mobile .bbop-container .bbop-image {
+      filter: blur(3px) brightness(0.7) !important;
+    }
+    
     .main-container {
       display: flex;
       flex-direction: column;
@@ -53,9 +62,21 @@
       text-shadow: 0 0 10px rgba(81, 36, 122, 0.6);
     }
     
+    @media (max-width: 767px) {
+      .header h1 {
+        font-size: 36px;
+      }
+    }
+    
     .header p {
       color: #aaa;
       font-size: 20px;
+    }
+    
+    @media (max-width: 767px) {
+      .header p {
+        font-size: 16px;
+      }
     }
     
     /* BBOP Image Fallback */
@@ -79,6 +100,12 @@
       color: white;
       text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
       z-index: 1;
+    }
+    
+    @media (max-width: 767px) {
+      .robot-text {
+        font-size: 32px;
+      }
     }
     
     /* BBOP Image and Login Container */
@@ -146,27 +173,14 @@
       }
     }
     
-    .bbop-container:hover .bbop-image {
-      filter: blur(3px) brightness(0.7);
-    }
-    
-    .bbop-container:hover .login-overlay {
-      opacity: 1;
-    }
-    
-    /* Mobile-specific: Always show login overlay when bbop-container is touched */
-    @media (max-width: 767px) {
-      .bbop-container {
-        pointer-events: none;
-      }
-      
-      .login-overlay {
-        opacity: 1;
-        pointer-events: auto;
-      }
-      
-      .bbop-image {
+    /* Desktop hover effect */
+    @media (min-width: 768px) {
+      .bbop-container:hover .bbop-image {
         filter: blur(3px) brightness(0.7);
+      }
+      
+      .bbop-container:hover .login-overlay {
+        opacity: 1;
       }
     }
     
@@ -696,7 +710,6 @@
       padding: 3px 6px;
       font-size: 11px;
       cursor: pointer;
-      opacity: 0;
       transition: opacity 0.2s ease;
     }
     
@@ -709,15 +722,18 @@
       }
     }
     
-    /* Always show copy button on mobile for better UX */
-    @media (max-width: 767px) {
-      .copy-btn {
-        opacity: 0.8;
-      }
+    body.is-mobile .copy-btn {
+      opacity: 0.8;
     }
     
-    .prompt-card:hover .copy-btn {
-      opacity: 1;
+    @media (min-width: 768px) {
+      .copy-btn {
+        opacity: 0;
+      }
+      
+      .prompt-card:hover .copy-btn {
+        opacity: 1;
+      }
     }
     
     .copy-btn:hover {
@@ -858,6 +874,22 @@
   </div>
   
   <script>
+    // Detect if on mobile device and apply appropriate class immediately
+    function detectMobile() {
+      const isMobile = window.innerWidth < 768;
+      if (isMobile) {
+        document.body.classList.add('is-mobile');
+      } else {
+        document.body.classList.remove('is-mobile');
+      }
+    }
+    
+    // Run on page load
+    detectMobile();
+    
+    // Also run on resize
+    window.addEventListener('resize', detectMobile);
+    
     // Get DOM elements
     const bbopContainer = document.getElementById('bbop-container');
     const loginOverlay = document.getElementById('login-overlay');
@@ -873,36 +905,59 @@
     const chatInterface = document.getElementById('chat-interface');
     const studentIdInput = document.getElementById('studentIdInput');
     
-    // For mobile: Show login overlay by default
-    function checkMobile() {
-      if (window.innerWidth < 768) {
-        loginOverlay.style.opacity = "1";
-        bbopContainer.querySelector('.bbop-image').style.filter = "blur(3px) brightness(0.7)";
-      } else {
-        loginOverlay.style.opacity = "";
-        bbopContainer.querySelector('.bbop-image').style.filter = "";
-      }
-    }
-    
-    // Run check on page load and resize
-    window.addEventListener('load', checkMobile);
-    window.addEventListener('resize', checkMobile);
-    
     // Function to copy prompt text to clipboard
     function copyPrompt(element) {
       const promptText = element.querySelector('p').textContent;
-      navigator.clipboard.writeText(promptText).then(() => {
-        // Show toast notification
-        showToast('Prompt copied to clipboard!');
-        
-        // Highlight the copied card
-        element.style.backgroundColor = 'rgba(81, 36, 122, 0.4)';
-        setTimeout(() => {
-          element.style.backgroundColor = '';
-        }, 1000);
-      }).catch(err => {
-        console.error('Failed to copy text: ', err);
-      });
+      
+      // Modern clipboard API
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(promptText)
+          .then(() => {
+            showToast('Prompt copied to clipboard!');
+            highlightCopiedCard(element);
+          })
+          .catch(err => {
+            console.error('Failed to copy text: ', err);
+            // Fallback for mobile
+            copyTextFallback(promptText);
+          });
+      } else {
+        // Fallback for browsers without clipboard API
+        copyTextFallback(promptText);
+      }
+    }
+    
+    // Fallback copy method for mobile browsers
+    function copyTextFallback(text) {
+      // Create temporary textarea
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.style.position = 'fixed';  // Prevent scrolling to bottom
+      document.body.appendChild(textarea);
+      textarea.focus();
+      textarea.select();
+      
+      try {
+        const successful = document.execCommand('copy');
+        if (successful) {
+          showToast('Prompt copied to clipboard!');
+        } else {
+          showToast('Unable to copy. Please try again.');
+        }
+      } catch (err) {
+        console.error('Fallback: Could not copy text: ', err);
+        showToast('Unable to copy. Please try again.');
+      }
+      
+      document.body.removeChild(textarea);
+    }
+    
+    // Highlight the copied card with animation
+    function highlightCopiedCard(element) {
+      element.style.backgroundColor = 'rgba(81, 36, 122, 0.4)';
+      setTimeout(() => {
+        element.style.backgroundColor = '';
+      }, 1000);
     }
     
     // Function to show toast notification
@@ -1059,3 +1114,6 @@
       chatContainer.innerHTML = "";
       chatContainer.appendChild(iframe);
     }
+  </script>
+</body>
+</html>
