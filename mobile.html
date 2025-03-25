@@ -84,14 +84,28 @@
     /* BBOP Image and Login Container */
     .bbop-container {
       position: relative;
-      width: 700px;
-      height: 700px;
+      width: 350px;
+      height: 350px;
       margin: 0 auto;
       border-radius: 50%;
       overflow: hidden;
       cursor: pointer;
       box-shadow: 0 0 50px rgba(81, 36, 122, 0.4);
       transition: transform 0.3s ease;
+    }
+    
+    @media (min-width: 768px) {
+      .bbop-container {
+        width: 500px;
+        height: 500px;
+      }
+    }
+    
+    @media (min-width: 1024px) {
+      .bbop-container {
+        width: 700px;
+        height: 700px;
+      }
     }
     
     .bbop-container:active {
@@ -121,9 +135,15 @@
       opacity: 0;
       transition: var(--transition);
       border-radius: 50%;
-      padding: 40px;
+      padding: 20px;
       color: white;
       z-index: 10;
+    }
+    
+    @media (min-width: 768px) {
+      .login-overlay {
+        padding: 40px;
+      }
     }
     
     .bbop-container:hover .bbop-image {
@@ -132,6 +152,22 @@
     
     .bbop-container:hover .login-overlay {
       opacity: 1;
+    }
+    
+    /* Mobile-specific: Always show login overlay when bbop-container is touched */
+    @media (max-width: 767px) {
+      .bbop-container {
+        pointer-events: none;
+      }
+      
+      .login-overlay {
+        opacity: 1;
+        pointer-events: auto;
+      }
+      
+      .bbop-image {
+        filter: blur(3px) brightness(0.7);
+      }
     }
     
     /* Pulsing animation for the avatar container */
@@ -162,33 +198,55 @@
     }
     
     .login-form {
-      width: 80%;
-      max-width: 400px;
+      width: 90%;
+      max-width: 300px;
       text-align: center;
       background-color: rgba(0, 0, 0, 0.6);
-      padding: 30px;
+      padding: 20px;
       border-radius: 20px;
       backdrop-filter: blur(5px);
       border: 1px solid rgba(255, 255, 255, 0.1);
     }
     
+    @media (min-width: 768px) {
+      .login-form {
+        max-width: 400px;
+        padding: 30px;
+      }
+    }
+    
     .form-title {
-      margin-bottom: 20px;
-      font-size: 28px;
+      margin-bottom: 15px;
+      font-size: 22px;
       color: white;
       text-shadow: 0 0 10px rgba(81, 36, 122, 0.8);
     }
     
+    @media (min-width: 768px) {
+      .form-title {
+        margin-bottom: 20px;
+        font-size: 28px;
+      }
+    }
+    
     .form-input {
       width: 100%;
-      padding: 15px 20px;
+      padding: 12px 15px;
       border: 2px solid rgba(255, 255, 255, 0.2);
       border-radius: 10px;
       background-color: rgba(255, 255, 255, 0.1);
       color: white;
-      font-size: 18px;
-      margin-bottom: 20px;
+      font-size: 16px;
+      margin-bottom: 15px;
       transition: var(--transition);
+    }
+    
+    @media (min-width: 768px) {
+      .form-input {
+        padding: 15px 20px;
+        font-size: 18px;
+        margin-bottom: 20px;
+      }
     }
     
     .form-input::placeholder {
@@ -203,15 +261,22 @@
     
     .btn {
       width: 100%;
-      padding: 15px 0;
+      padding: 12px 0;
       border: none;
       border-radius: 10px;
       background-color: var(--primary-color);
       color: white;
-      font-size: 18px;
+      font-size: 16px;
       font-weight: 600;
       cursor: pointer;
       transition: var(--transition);
+    }
+    
+    @media (min-width: 768px) {
+      .btn {
+        padding: 15px 0;
+        font-size: 18px;
+      }
     }
     
     .btn:hover {
@@ -221,34 +286,62 @@
     }
     
     .id-hint {
-      margin-top: 15px;
-      font-size: 14px;
+      margin-top: 10px;
+      font-size: 12px;
       color: rgba(255, 255, 255, 0.7);
+    }
+    
+    @media (min-width: 768px) {
+      .id-hint {
+        margin-top: 15px;
+        font-size: 14px;
+      }
     }
     
     /* Error and loading states */
     #error-msg {
       color: #ff6b6b;
-      margin-top: 15px;
-      font-size: 14px;
+      margin-top: 10px;
+      font-size: 12px;
+    }
+    
+    @media (min-width: 768px) {
+      #error-msg {
+        margin-top: 15px;
+        font-size: 14px;
+      }
     }
     
     #loading {
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-top: 15px;
+      margin-top: 10px;
       color: white;
+    }
+    
+    @media (min-width: 768px) {
+      #loading {
+        margin-top: 15px;
+      }
     }
     
     .loading-spinner {
       border: 3px solid rgba(255, 255, 255, 0.2);
       border-top: 3px solid white;
       border-radius: 50%;
-      width: 20px;
-      height: 20px;
+      width: 18px;
+      height: 18px;
       animation: spin 1s linear infinite;
-      margin-right: 10px;
+      margin-right: 8px;
+    }
+    
+    @media (min-width: 768px) {
+      .loading-spinner {
+        width: 20px;
+        height: 20px;
+        margin-right: 10px;
+      }
     }
     
     @keyframes spin {
@@ -258,15 +351,22 @@
     
     /* Verification confirmation */
     .verification-container {
-      max-width: 450px;
+      max-width: 350px;
       width: 90%;
       background-color: rgba(20, 20, 20, 0.9);
-      padding: 30px;
+      padding: 20px;
       border-radius: 15px;
       box-shadow: 0 5px 30px rgba(0, 0, 0, 0.3);
       text-align: center;
       border-top: 5px solid var(--primary-color);
       animation: fadeIn 0.5s ease;
+    }
+    
+    @media (min-width: 768px) {
+      .verification-container {
+        max-width: 450px;
+        padding: 30px;
+      }
     }
     
     @keyframes fadeIn {
@@ -276,13 +376,27 @@
     
     #success-msg {
       color: #4caf50;
-      font-size: 22px;
-      margin-bottom: 25px;
+      font-size: 18px;
+      margin-bottom: 20px;
+    }
+    
+    @media (min-width: 768px) {
+      #success-msg {
+        font-size: 22px;
+        margin-bottom: 25px;
+      }
     }
     
     .button-group {
       display: flex;
+      flex-direction: column;
       gap: 10px;
+    }
+    
+    @media (min-width: 768px) {
+      .button-group {
+        flex-direction: row;
+      }
     }
     
     .btn-secondary {
@@ -311,13 +425,24 @@
     
     .student-info {
       background-color: rgba(30, 30, 30, 0.9);
-      padding: 15px 20px;
+      padding: 12px 15px;
       border-radius: 12px;
-      margin-bottom: 15px;
+      margin-bottom: 12px;
       display: flex;
-      justify-content: space-between;
-      align-items: center;
+      flex-direction: column;
+      gap: 8px;
       box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+    
+    @media (min-width: 768px) {
+      .student-info {
+        padding: 15px 20px;
+        margin-bottom: 15px;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        gap: 0;
+      }
     }
     
     .student-name {
@@ -328,20 +453,34 @@
     .student-id {
       font-family: monospace;
       background-color: rgba(255, 255, 255, 0.1);
-      padding: 6px 12px;
+      padding: 4px 8px;
       border-radius: 6px;
-      font-size: 14px;
+      font-size: 12px;
       color: #ccc;
+      display: inline-block;
+    }
+    
+    @media (min-width: 768px) {
+      .student-id {
+        padding: 6px 12px;
+        font-size: 14px;
+      }
     }
     
     #chat-container {
       width: 100%;
-      height: 600px;
+      height: 500px;
       border-radius: 15px;
       overflow: hidden;
       box-shadow: 0 5px 30px rgba(0, 0, 0, 0.2);
       background-color: rgba(20, 20, 20, 0.9);
       flex-grow: 1;
+    }
+    
+    @media (min-width: 768px) {
+      #chat-container {
+        height: 600px;
+      }
     }
     
     /* Solution for the iframe size issue */
@@ -353,15 +492,13 @@
     #chat-container {
       flex: 1;
       min-height: 500px;
-      /* Set a fixed height that works well across devices */
-      height: 600px;
     }
     
     .disclaimer {
       max-width: 800px;
-      margin-top: 40px;
+      margin-top: 30px;
       text-align: center;
-      font-size: 14px;
+      font-size: 12px;
       color: #888;
       line-height: 1.6;
       padding: 0 20px;
@@ -369,106 +506,214 @@
       clear: both;
     }
     
+    @media (min-width: 768px) {
+      .disclaimer {
+        margin-top: 40px;
+        font-size: 14px;
+      }
+    }
+    
     /* BBOP Introduction styles */
     .bbop-intro-panel {
       background-color: rgba(30, 30, 30, 0.95);
       border-radius: 12px;
-      padding: 20px;
-      margin-bottom: 15px;
+      padding: 15px;
+      margin-bottom: 12px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
       border-left: 4px solid var(--secondary-color);
-      /* Remove max-height and overflow-y to prevent scrolling */
+    }
+    
+    @media (min-width: 768px) {
+      .bbop-intro-panel {
+        padding: 20px;
+        margin-bottom: 15px;
+      }
     }
     
     .bbop-intro-panel h3 {
       color: var(--secondary-color);
-      margin-bottom: 10px;
-      font-size: 22px;
+      margin-bottom: 8px;
+      font-size: 18px;
+    }
+    
+    @media (min-width: 768px) {
+      .bbop-intro-panel h3 {
+        margin-bottom: 10px;
+        font-size: 22px;
+      }
     }
     
     .bbop-intro-panel p {
       color: #ddd;
-      line-height: 1.5;
-      margin-bottom: 15px;
+      line-height: 1.4;
+      margin-bottom: 12px;
+      font-size: 14px;
+    }
+    
+    @media (min-width: 768px) {
+      .bbop-intro-panel p {
+        line-height: 1.5;
+        margin-bottom: 15px;
+        font-size: 16px;
+      }
     }
     
     .bbop-capabilities ul {
       color: #ddd;
-      margin-left: 25px;
-      margin-bottom: 15px;
+      margin-left: 20px;
+      margin-bottom: 12px;
+      font-size: 14px;
+    }
+    
+    @media (min-width: 768px) {
+      .bbop-capabilities ul {
+        margin-left: 25px;
+        margin-bottom: 15px;
+        font-size: 16px;
+      }
     }
     
     .bbop-capabilities li {
-      margin-bottom: 5px;
+      margin-bottom: 3px;
+    }
+    
+    @media (min-width: 768px) {
+      .bbop-capabilities li {
+        margin-bottom: 5px;
+      }
     }
     
     .feedback-note {
       font-style: italic;
-      font-size: 14px;
+      font-size: 12px;
       color: #bbb;
       border-left: 3px solid var(--secondary-color);
-      padding-left: 10px;
-      margin-top: 10px;
+      padding-left: 8px;
+      margin-top: 8px;
+    }
+    
+    @media (min-width: 768px) {
+      .feedback-note {
+        font-size: 14px;
+        padding-left: 10px;
+        margin-top: 10px;
+      }
     }
     
     .disclaimer-note {
-      font-size: 14px;
+      font-size: 12px;
       color: #888;
-      padding: 10px;
-      margin-top: 15px;
+      padding: 8px;
+      margin-top: 12px;
       background-color: rgba(0, 0, 0, 0.3);
       border-radius: 8px;
     }
     
+    @media (min-width: 768px) {
+      .disclaimer-note {
+        font-size: 14px;
+        padding: 10px;
+        margin-top: 15px;
+      }
+    }
+    
     .prompt-suggestions h4 {
-      font-size: 18px;
+      font-size: 16px;
       color: var(--light-text);
-      margin-bottom: 12px;
+      margin-bottom: 10px;
       font-weight: 500;
+    }
+    
+    @media (min-width: 768px) {
+      .prompt-suggestions h4 {
+        font-size: 18px;
+        margin-bottom: 12px;
+      }
     }
     
     .prompt-cards {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-      gap: 15px;
-      /* Remove max-height and overflow-y to prevent scrolling */
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+    
+    @media (min-width: 768px) {
+      .prompt-cards {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+      }
+    }
+    
+    @media (min-width: 1024px) {
+      .prompt-cards {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+      }
     }
     
     .prompt-card {
       background-color: rgba(81, 36, 122, 0.2);
       border: 1px solid rgba(81, 36, 122, 0.5);
       border-radius: 8px;
-      padding: 15px;
+      padding: 12px;
       transition: all 0.2s ease;
       position: relative;
       cursor: pointer;
     }
     
-    .prompt-card:hover {
+    @media (min-width: 768px) {
+      .prompt-card {
+        padding: 15px;
+      }
+    }
+    
+    .prompt-card:hover, .prompt-card:active {
       background-color: rgba(81, 36, 122, 0.3);
       transform: translateY(-2px);
     }
     
     .prompt-card p {
       color: #eee;
-      font-size: 14px;
+      font-size: 13px;
       margin: 0;
       padding-right: 30px;
     }
     
+    @media (min-width: 768px) {
+      .prompt-card p {
+        font-size: 14px;
+      }
+    }
+    
     .copy-btn {
       position: absolute;
-      top: 10px;
-      right: 10px;
+      top: 8px;
+      right: 8px;
       background-color: rgba(218, 170, 0, 0.6);
       color: white;
       border: none;
       border-radius: 4px;
-      padding: 4px 8px;
-      font-size: 12px;
+      padding: 3px 6px;
+      font-size: 11px;
       cursor: pointer;
       opacity: 0;
       transition: opacity 0.2s ease;
+    }
+    
+    @media (min-width: 768px) {
+      .copy-btn {
+        top: 10px;
+        right: 10px;
+        padding: 4px 8px;
+        font-size: 12px;
+      }
+    }
+    
+    /* Always show copy button on mobile for better UX */
+    @media (max-width: 767px) {
+      .copy-btn {
+        opacity: 0.8;
+      }
     }
     
     .prompt-card:hover .copy-btn {
@@ -487,11 +732,18 @@
       transform: translateX(-50%);
       background-color: rgba(0, 0, 0, 0.7);
       color: white;
-      padding: 10px 20px;
+      padding: 8px 16px;
       border-radius: 4px;
       z-index: 1000;
       opacity: 0;
       transition: opacity 0.3s ease;
+      font-size: 14px;
+    }
+    
+    @media (min-width: 768px) {
+      .toast {
+        padding: 10px 20px;
+      }
     }
     
     .toast.show {
@@ -620,6 +872,21 @@
     const chatContainer = document.getElementById('chat-container');
     const chatInterface = document.getElementById('chat-interface');
     const studentIdInput = document.getElementById('studentIdInput');
+    
+    // For mobile: Show login overlay by default
+    function checkMobile() {
+      if (window.innerWidth < 768) {
+        loginOverlay.style.opacity = "1";
+        bbopContainer.querySelector('.bbop-image').style.filter = "blur(3px) brightness(0.7)";
+      } else {
+        loginOverlay.style.opacity = "";
+        bbopContainer.querySelector('.bbop-image').style.filter = "";
+      }
+    }
+    
+    // Run check on page load and resize
+    window.addEventListener('load', checkMobile);
+    window.addEventListener('resize', checkMobile);
     
     // Function to copy prompt text to clipboard
     function copyPrompt(element) {
@@ -792,6 +1059,3 @@
       chatContainer.innerHTML = "";
       chatContainer.appendChild(iframe);
     }
-  </script>
-</body>
-</html>
