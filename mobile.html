@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>B-BOP | MGTS2603 AI Assistant</title>
+  <style>
+    :root {
+      --primary-color: #51247A;
+      --primary-light: #6a359c;
+      --secondary-color: #DAAA00;
+      --dark-color: #121212;
+      --light-text: #f5f5f5;
+      --border-radius: 12px;
+      --transition: all 0.3s ease;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--dark-color);
+      color: var(--light-text);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      overflow-x: hidden;
+    }
+    
+    .main-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      max-width: 1400px;
+      width: 100%;
+    }
+    
+    .header {
+      margin-bottom: 30px;
+      text-align: center;
+    }
+    
+    .header h1 {
+      font-size: 48px;
+      color: var(--light-text);
+      margin-bottom: 5px;
+      text-shadow: 0 0 10px rgba(81, 36, 122, 0.6);
+    }
+    
+    .header p {
+      color: #aaa;
+      font-size: 20px;
+    }
+    
+    /* BBOP Image Fallback */
+    .bbop-image-fallback {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 8px solid var(--primary-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      background-color: #2D1344;
+      overflow: hidden;
+    }
+    
+    .robot-text {
+      position: absolute;
+      font-size: 48px;
+      font-weight: 700;
+      color: white;
+      text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+      z-index: 1;
+    }
+    
+    /* BBOP Image and Login Container */
+    .bbop-container {
+      position: relative;
+      width: 700px;
+      height: 700px;
+      margin: 0 auto;
+      border-radius: 50%;
+      overflow: hidden;
+      cursor: pointer;
+      box-shadow: 0 0 50px rgba(81, 36, 122, 0.4);
+      transition: transform 0.3s ease;
+    }
+    
+    .bbop-container:active {
+      transform: scale(0.98);
+    }
+    
+    .bbop-image {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      transition: var(--transition);
+      border-radius: 50%;
+      border: 8px solid var(--primary-color);
+    }
+    
+    .login-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      transition: var(--transition);
+      border-radius: 50%;
+      padding: 40px;
+      color: white;
+      z-index: 10;
+    }
+    
+    .bbop-container:hover .bbop-image {
+      filter: blur(3px) brightness(0.7);
+    }
+    
+    .bbop-container:hover .login-overlay {
+      opacity: 1;
+    }
+    
+    /* Pulsing animation for the avatar container */
+    .pulse-ring {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      border-radius: 50%;
+      border: 3px solid rgba(81, 36, 122, 0.5);
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0% {
+        transform: scale(1);
+        opacity: 1;
+      }
+      70% {
+        transform: scale(1.05);
+        opacity: 0;
+      }
+      100% {
+        transform: scale(1);
+        opacity: 0;
+      }
+    }
+    
+    .login-form {
+      width: 80%;
+      max-width: 400px;
+      text-align: center;
+      background-color: rgba(0, 0, 0, 0.6);
+      padding: 30px;
+      border-radius: 20px;
+      backdrop-filter: blur(5px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .form-title {
+      margin-bottom: 20px;
+      font-size: 28px;
+      color: white;
+      text-shadow: 0 0 10px rgba(81, 36, 122, 0.8);
+    }
+    
+    .form-input {
+      width: 100%;
+      padding: 15px 20px;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+      background-color: rgba(255, 255, 255, 0.1);
+      color: white;
+      font-size: 18px;
+      margin-bottom: 20px;
+      transition: var(--transition);
+    }
+    
+    .form-input::placeholder {
+      color: rgba(255, 255, 255, 0.6);
+    }
+    
+    .form-input:focus {
+      outline: none;
+      border-color: var(--secondary-color);
+      background-color: rgba(255, 255, 255, 0.15);
+    }
+    
+    .btn {
+      width: 100%;
+      padding: 15px 0;
+      border: none;
+      border-radius: 10px;
+      background-color: var(--primary-color);
+      color: white;
+      font-size: 18px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    
+    .btn:hover {
+      background-color: var(--primary-light);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    }
+    
+    .id-hint {
+      margin-top: 15px;
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.7);
+    }
+    
+    /* Error and loading states */
+    #error-msg {
+      color: #ff6b6b;
+      margin-top: 15px;
+      font-size: 14px;
+    }
+    
+    #loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 15px;
+      color: white;
+    }
+    
+    .loading-spinner {
+      border: 3px solid rgba(255, 255, 255, 0.2);
+      border-top: 3px solid white;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      animation: spin 1s linear infinite;
+      margin-right: 10px;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    /* Verification confirmation */
+    .verification-container {
+      max-width: 450px;
+      width: 90%;
+      background-color: rgba(20, 20, 20, 0.9);
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 5px 30px rgba(0, 0, 0, 0.3);
+      text-align: center;
+      border-top: 5px solid var(--primary-color);
+      animation: fadeIn 0.5s ease;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    #success-msg {
+      color: #4caf50;
+      font-size: 22px;
+      margin-bottom: 25px;
+    }
+    
+    .button-group {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .btn-secondary {
+      background-color: #333;
+      color: white;
+    }
+    
+    .btn-secondary:hover {
+      background-color: #444;
+    }
+    
+    .btn-danger {
+      background-color: #f44336;
+    }
+    
+    .btn-danger:hover {
+      background-color: #e53935;
+    }
+    
+    /* Chat interface */
+    .chat-interface {
+      width: 100%;
+      max-width: 900px;
+      animation: fadeIn 0.5s ease;
+    }
+    
+    .student-info {
+      background-color: rgba(30, 30, 30, 0.9);
+      padding: 15px 20px;
+      border-radius: 12px;
+      margin-bottom: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+    
+    .student-name {
+      font-weight: 600;
+      color: var(--light-text);
+    }
+    
+    .student-id {
+      font-family: monospace;
+      background-color: rgba(255, 255, 255, 0.1);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 14px;
+      color: #ccc;
+    }
+    
+    #chat-container {
+      width: 100%;
+      height: 600px;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 5px 30px rgba(0, 0, 0, 0.2);
+      background-color: rgba(20, 20, 20, 0.9);
+      flex-grow: 1;
+    }
+    
+    /* Solution for the iframe size issue */
+    .chat-interface {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    #chat-container {
+      flex: 1;
+      min-height: 500px;
+      /* Set a fixed height that works well across devices */
+      height: 600px;
+    }
+    
+    .disclaimer {
+      max-width: 800px;
+      margin-top: 40px;
+      text-align: center;
+      font-size: 14px;
+      color: #888;
+      line-height: 1.6;
+      padding: 0 20px;
+      margin-bottom: 20px;
+      clear: both;
+    }
+    
+    /* BBOP Introduction styles */
+    .bbop-intro-panel {
+      background-color: rgba(30, 30, 30, 0.95);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 15px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      border-left: 4px solid var(--secondary-color);
+      /* Remove max-height and overflow-y to prevent scrolling */
+    }
+    
+    .bbop-intro-panel h3 {
+      color: var(--secondary-color);
+      margin-bottom: 10px;
+      font-size: 22px;
+    }
+    
+    .bbop-intro-panel p {
+      color: #ddd;
+      line-height: 1.5;
+      margin-bottom: 15px;
+    }
+    
+    .bbop-capabilities ul {
+      color: #ddd;
+      margin-left: 25px;
+      margin-bottom: 15px;
+    }
+    
+    .bbop-capabilities li {
+      margin-bottom: 5px;
+    }
+    
+    .feedback-note {
+      font-style: italic;
+      font-size: 14px;
+      color: #bbb;
+      border-left: 3px solid var(--secondary-color);
+      padding-left: 10px;
+      margin-top: 10px;
+    }
+    
+    .disclaimer-note {
+      font-size: 14px;
+      color: #888;
+      padding: 10px;
+      margin-top: 15px;
+      background-color: rgba(0, 0, 0, 0.3);
+      border-radius: 8px;
+    }
+    
+    .prompt-suggestions h4 {
+      font-size: 18px;
+      color: var(--light-text);
+      margin-bottom: 12px;
+      font-weight: 500;
+    }
+    
+    .prompt-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 15px;
+      /* Remove max-height and overflow-y to prevent scrolling */
+    }
+    
+    .prompt-card {
+      background-color: rgba(81, 36, 122, 0.2);
+      border: 1px solid rgba(81, 36, 122, 0.5);
+      border-radius: 8px;
+      padding: 15px;
+      transition: all 0.2s ease;
+      position: relative;
+      cursor: pointer;
+    }
+    
+    .prompt-card:hover {
+      background-color: rgba(81, 36, 122, 0.3);
+      transform: translateY(-2px);
+    }
+    
+    .prompt-card p {
+      color: #eee;
+      font-size: 14px;
+      margin: 0;
+      padding-right: 30px;
+    }
+    
+    .copy-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background-color: rgba(218, 170, 0, 0.6);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 4px 8px;
+      font-size: 12px;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+    
+    .prompt-card:hover .copy-btn {
+      opacity: 1;
+    }
+    
+    .copy-btn:hover {
+      background-color: rgba(218, 170, 0, 0.9);
+    }
+    
+    /* Toast notification for copy success */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: rgba(0, 0, 0, 0.7);
+      color: white;
+      padding: 10px 20px;
+      border-radius: 4px;
+      z-index: 1000;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    
+    .toast.show {
+      opacity: 1;
+    }
+    
+    /* Mobile-specific styles */
+    .mobile-login-button {
+      display: none;
+      width: 90%;
+      max-width: 300px;
+      padding: 15px 20px;
+      margin: 20px auto;
+      border: none;
+      border-radius: 10px;
+      background-color: var(--primary-color);
+      color: white;
+      font-size: 18px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    }
+    
+    .mobile-login-button:hover, .mobile-login-button:active {
+      background-color: var(--primary-light);
+    }
+    
+    .close-overlay {
+      display: none;
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      font-size: 28px;
+      color: white;
+      cursor: pointer;
+      background-color: rgba(0, 0, 0, 0.5);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      text-align: center;
+      line-height: 38px;
+      z-index: 100;
+    }
+    
+    .mobile-tap-instruction {
+      display: none;
+      text-align: center;
+      margin-top: 10px;
+      font-size: 14px;
+      color: #aaa;
+    }
+    
+    /* Mobile responsive styles */
+    @media (max-width: 768px) {
+      body {
+        padding: 10px;
+      }
+      
+      .header h1 {
+        font-size: 36px;
+      }
+      
+      .header p {
+        font-size: 16px;
+      }
+      
+      .bbop-container {
+        width: 300px;
+        height: 300px;
+      }
+      
+      .robot-text {
+        font-size: 28px;
+      }
+      
+      .login-overlay {
+        opacity: 0;
+        border-radius: 50%;
+        padding: 20px;
+      }
+      
+      .close-overlay {
+        display: block;
+      }
+      
+      .mobile-login-button {
+        display: block;
+        margin-top: 20px;
+      }
+      
+      .mobile-tap-instruction {
+        display: block;
+      }
+      
+      /* Fix for mobile login overlay visibility */
+      .bbop-container.mobile-form-visible .login-overlay {
+        opacity: 1;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border-radius: 0;
+        z-index: 1000;
+        background-color: rgba(0, 0, 0, 0.9);
+      }
+      
+      /* Create a backdrop for the login form in mobile */
+      body.mobile-form-visible::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.8);
+        z-index: 999;
+      }
+      
+      .verification-container {
+        max-width: 90%;
+        padding: 20px;
+      }
+      
+      .button-group {
+        flex-direction: column;
+      }
+      
+      /* Adjust chat interface for mobile */
+      .student-info {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
+      
+      .student-id {
+        align-self: flex-start;
+      }
+      
+      #chat-container {
+        height: 500px;
+      }
+      
+      /* Make the prompt cards full width on mobile */
+      .prompt-cards {
+        grid-template-columns: 1fr;
+      }
+      
+      /* Make copy button always visible on mobile */
+      .prompt-card .copy-btn {
+        opacity: 1;
+      }
+    }
+    
+    /* For very small screens */
+    @media (max-width: 350px) {
+      .bbop-container {
+        width: 250px;
+        height: 250px;
+      }
+      
+      .header h1 {
+        font-size: 32px;
+      }
+      
+      .form-title {
+        font-size: 22px;
+      }
+      
+      .login-form {
+        width: 95%;
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="main-container">
+    <div class="header">
+      <h1>B-BOP</h1>
+      <p>MGTS2603 AI Assistant</p>
+    </div>
+    
+    <!-- Main BBOP avatar with login overlay -->
+    <div id="login-section">
+      <div class="bbop-container" id="bbop-container">
+        <div class="pulse-ring"></div>
+        <!-- Improved image loading with better fallback -->
+        <img src="https://raw.githubusercontent.com/uqsmitc6/BBOP/refs/heads/main/BBOP_icon.jpg" alt="B-BOP Robot Avatar" class="bbop-image" crossorigin="anonymous" onerror="this.style.display='none'; this.parentNode.querySelector('.bbop-image-fallback').style.display='flex';">
+        
+        <div class="bbop-image-fallback" style="display: none;">
+          <span class="robot-text">B-BOP</span>
+        </div>
+        
+        <div class="login-overlay" id="login-overlay">
+          <!-- Add close button for mobile -->
+          <div class="close-overlay" id="close-overlay">×</div>
+          
+          <div class="login-form">
+            <h3 class="form-title">Enter Student ID</h3>
+            <input type="text" id="studentIdInput" class="form-input" placeholder="e.g., s1234567" autocomplete="off">
+            <button class="btn" id="verifyBtn">Verify ID</button>
+            
+            <p class="id-hint">Please enter your UQ student ID in the format sXXXXXXX</p>
+            <p id="error-msg"></p>
+            
+            <div id="loading" style="display: none;">
+              <div class="loading-spinner"></div>
+              <span>Verifying...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Mobile tap instruction -->
+      <p class="mobile-tap-instruction">Tap on B-BOP to login or use the button below</p>
+      
+      <!-- Dedicated login button for mobile -->
+      <button class="mobile-login-button" id="mobile-login-button">
+        Login to B-BOP
+      </button>
+    </div>
+    
+    <!-- Verification Confirmation Section -->
+    <div id="verification-container" style="display: none;" class="verification-container">
+      <p id="success-msg"></p>
+      
+      <div class="button-group">
+        <button class="btn" id="confirmBtn">Yes, that's me</button>
+        <button class="btn btn-danger" id="cancelBtn">No, that's not me</button>
+      </div>
+    </div>
+    
+    <!-- Chat Interface -->
+    <div id="chat-interface" style="display: none;" class="chat-interface">
+      <div class="student-info">
+        <span class="student-name" id="student-name-display"></span>
+        <span class="student-id" id="student-id-display"></span>
+      </div>
+      
+      <!-- B-BOP Introduction Panel -->
+      <div id="bbop-introduction" class="bbop-intro-panel">
+        <h3>Welcome to B-BOP: Leadership Course Assistant for MGTS2603</h3>
+        <p>B-BOP is designed to help you understand leadership concepts, clarify assessment requirements, and provide guidance throughout your Leading and Managing People course.</p>
+        
+        <div class="bbop-capabilities">
+          <p><strong>B-BOP can:</strong></p>
+          <ul>
+            <li>Validate leader choices for Assessment 2</li>
+            <li>Explain leadership theories and concepts</li>
+            <li>Provide information about submission deadlines</li>
+            <li>Create practice quizzes for review</li>
+            <li>Offer general reflection guidance</li>
+          </ul>
+          <p class="feedback-note">This is a new tool that's still being refined. Your feedback on your experience with B-BOP will help improve it for all students. Please share any suggestions with your teaching team.</p>
+          <p class="disclaimer-note">B-BOP is an AI assistant designed to support MGTS2603 students. While it provides guidance based on course materials, always verify important information with your course coordinator or tutor. B-BOP adheres to the course AI usage guidelines as outlined in the assessment criteria.</p>
+        </div>
+        
+        <div class="prompt-suggestions">
+          <h4>Try asking me:</h4>
+          <div class="prompt-cards">
+            <div class="prompt-card" onclick="copyPrompt(this)">
+              <p>Would [leader name] be an appropriate choice for my Assessment 2 case study? I'm considering [specific leader].</p>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <div class="prompt-card" onclick="copyPrompt(this)">
+              <p>Can you explain the difference between transformational and transactional leadership theories?</p>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <div class="prompt-card" onclick="copyPrompt(this)">
+              <p>What are the submission deadlines and requirements for Assessment 1 (weekly reflection journals)?</p>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <div class="prompt-card" onclick="copyPrompt(this)">
+              <p>Could you quiz me on leadership theories with both recall and critical thinking questions?</p>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <div class="prompt-card" onclick="copyPrompt(this)">
+              <p>I need to reflect on team dynamics for this week's journal. What general questions should I consider about communication patterns and leadership styles?</p>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <div class="prompt-card" onclick="copyPrompt(this)">
+              <p>I'm planning to use [theory name] for my Assessment 2 analysis of [leader name]. Can you confirm if this theory is covered in our course and explain how it might be relevant to leadership analysis?</p>
+              <button class="copy-btn">Copy</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div id="chat-container"></div>
+    </div>
+  </div>
+  
+  <script>
+    // Get DOM elements
+    const bbopContainer = document.getElementById('bbop-container');
+    const loginOverlay = document.getElementById('login-overlay');
+    const verifyBtn = document.getElementById('verifyBtn');
+    const confirmBtn = document.getElementById('confirmBtn');
+    const cancelBtn = document.getElementById('cancelBtn');
+    const loginSection = document.getElementById('login-section');
+    const verificationContainer = document.getElementById('verification-container');
+    const errorMsg = document.getElementById('error-msg');
+    const successMsg = document.getElementById('success-msg');
+    const loadingMsg = document.getElementById('loading');
+    const chatContainer = document.getElementById('chat-container');
+    const chatInterface = document.getElementById('chat-interface');
+    const studentIdInput = document.getElementById('studentIdInput');
+    const mobileLoginButton = document.getElementById('mobile-login-button');
+    const closeOverlay = document.getElementById('close-overlay');
+    
+    // Function to detect touch capability
+    function isTouchDevice() {
+      return ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (navigator.msMaxTouchPoints > 0);
+    }
+    
+    // Function to show the login form
+    function showLoginForm() {
+      document.body.classList.add('mobile-form-visible');
+      bbopContainer.classList.add('mobile-form-visible');
+      
+      // Focus the input field
+      setTimeout(() => {
+        studentIdInput.focus();
+      }, 300);
+    }
+    
+    // Function to hide the login form
+    function hideLoginForm() {
+      document.body.classList.remove('mobile-form-visible');
+      bbopContainer.classList.remove('mobile-form-visible');
+    }
+    
+    // Function to copy prompt text to clipboard
+    function copyPrompt(element) {
+      const promptText = element.querySelector('p').textContent;
+      navigator.clipboard.writeText(promptText).then(() => {
+        // Show toast notification
+        showToast('Prompt copied to clipboard!');
+        
+        // Highlight the copied card
+        element.style.backgroundColor = 'rgba(81, 36, 122, 0.4)';
+        setTimeout(() => {
+          element.style.backgroundColor = '';
+        }, 1000);
+      }).catch(err => {
+        console.error('Failed to copy text: ', err);
+      });
+    }
+    
+    // Function to show toast notification
+    function showToast(message) {
+      // Create toast if it doesn't exist
+      let toast = document.getElementById('copy-toast');
+      if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'copy-toast';
+        toast.className = 'toast';
+        document.body.appendChild(toast);
+      }
+      
+      // Set message and show
+      toast.textContent = message;
+      toast.classList.add('show');
+      
+      // Hide after 2 seconds
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2000);
+    }
+    
+    // Setup event listeners for both desktop and mobile experiences
+    // For all devices - clicking the avatar shows the login form
+    bbopContainer.addEventListener('click', function() {
+      showLoginForm();
+    });
+    
+    // Mobile login button shows the form
+    mobileLoginButton.addEventListener('click', function() {
+      showLoginForm();
+    });
+    
+    // Close button hides the form
+    closeOverlay.addEventListener('click', function(e) {
+      e.stopPropagation();
+      hideLoginForm();
+    });
+    
+    // Prevent form clicks from bubbling to container
+    loginOverlay.addEventListener('click', function(e) {
+      e.stopPropagation();
+    });
+    
+    // Store verified student data
+    let verifiedStudent = null;
+    
+    // Add event listener for the verify button
+    verifyBtn.addEventListener('click', verifyStudentId);
+    
+    // Also verify when pressing Enter in the input field
+    studentIdInput.addEventListener('keypress', function(event) {
+      if (event.key === 'Enter') {
+        verifyStudentId();
+      }
+    });
+    
+    // Verification function
+    async function verifyStudentId() {
+      let studentId = studentIdInput.value.trim();
+      errorMsg.textContent = ""; // clear previous errors
+      
+      if (!studentId) {
+        errorMsg.textContent = "Please enter a student ID";
+        return;
+      }
+      
+      // Basic format validation for students and secret support for staff
+      const studentIdRegex = /^s\d{7}$/i;
+      const staffIdRegex = /^uq[a-z0-9]{6}$/i;
+      
+      // Allow both student and staff IDs to pass, but only show error for student format
+      if (!studentIdRegex.test(studentId) && !staffIdRegex.test(studentId)) {
+        errorMsg.textContent = "Please enter a valid student ID in the format sXXXXXXX";
+        return;
+      }
+      
+      // Normalize the case for student and staff IDs (even though we fixed it on the server)
+      if (studentId.toLowerCase().startsWith('s')) {
+        studentId = studentId.toLowerCase();
+      } else if (studentId.toLowerCase().startsWith('uq')) {
+        studentId = studentId.toLowerCase();
+      }
+      
+      // Show loading message
+      loadingMsg.style.display = "flex";
+      
+      try {
+        // Call the Google Apps Script to verify the ID
+        const apiUrl = 'https://script.google.com/macros/s/AKfycbzestJvZt4tdl_a0Ka2I8u4wkM4rrEH3rqeyLQle_dhlXFpDaGgm_RpK11fGZbtw0T0/exec';
+        console.log("Verifying student ID:", studentId);
+        
+        const response = await fetch(`${apiUrl}?id=${encodeURIComponent(studentId)}`);
+        console.log("Response status:", response.status);
+        
+        // Hide loading message
+        loadingMsg.style.display = "none";
+        
+        if (!response.ok) {
+          throw new Error(`Server error: ${response.status}`);
+        }
+        
+        // Parse the response
+        const result = await response.json();
+        console.log("Verification result:", result);
+        
+        // Check if the ID was found
+        if (result.valid) {
+          // Store the verified student data
+          verifiedStudent = result;
+          
+          // Hide login form
+          hideLoginForm();
+          
+          // Show the confirmation section
+          loginSection.style.display = "none";
+          verificationContainer.style.display = "block";
+          successMsg.textContent = `Hello, ${result.name}! Is this correct?`;
+        } else {
+          // ID not found
+          errorMsg.textContent = "Student ID not found. Please check your ID or contact your course coordinator.";
+        }
+      } catch (err) {
+        // Hide loading message
+        loadingMsg.style.display = "none";
+        console.error("Verification error:", err);
+        errorMsg.textContent = "Error verifying ID. Please try again later.";
+      }
+    }
+    
+    // Add event listener for the confirm button
+    confirmBtn.addEventListener('click', () => {
+      if (verifiedStudent) {
+        // Hide the verification section
+        verificationContainer.style.display = "none";
+        
+        // Update student info display in the header bar
+        document.getElementById('student-name-display').textContent = verifiedStudent.name;
+        document.getElementById('student-id-display').textContent = verifiedStudent.id;
+        
+        // Show the chat interface
+        chatInterface.style.display = "block";
+        
+        // Launch the chatbot with the verified student data
+        launchChatbot(verifiedStudent);
+      }
+    });
+    
+    // Add event listener for the cancel button
+    cancelBtn.addEventListener('click', () => {
+      // Go back to the login section
+      verificationContainer.style.display = "none";
+      loginSection.style.display = "block";
+      // Clear the input field
+      studentIdInput.value = "";
+      // Reset mobile form visibility
+      hideLoginForm();
+    });
+    
+    // Function to launch the chatbot
+    function launchChatbot(studentData) {
+      // Prepare the chatbot URL
+      let chatbotUrl = "https://interfaces.zapier.com/embed/chatbot/cm6g1x781001m1fs6d6i4c3j1";
+      
+      // Use the parameters that work
+      chatbotUrl += `?studentId=${encodeURIComponent(studentData.id)}`;
+      chatbotUrl += `&studentName=${encodeURIComponent(studentData.name)}`;
+      
+      console.log("Loading chatbot with URL:", chatbotUrl);
+      
+      // Create an iframe to embed the chatbot
+      const iframe = document.createElement('iframe');
+      iframe.src = chatbotUrl;
+      iframe.width = "100%";
+      iframe.height = "100%";
+      iframe.style.border = "none";
+      iframe.setAttribute('allow', 'clipboard-write *');
+      
+      // Add the iframe to the chatbot container
+      chatContainer.innerHTML = "";
+      chatContainer.appendChild(iframe);
+    }
+  </script>
+</body>
+</html>
