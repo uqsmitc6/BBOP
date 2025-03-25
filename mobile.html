@@ -1,43 +1,4 @@
-/* Fix for mobile login overlay visibility */
-      .bbop-container.mobile-form-visible .login-overlay {
-        opacity: 1;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        border-radius: 0;
-        z-index: 1000;
-        background-color: rgba(0, 0, 0, 0.95);
-        padding-top: 60px; /* Add space for the close button */
-      }
-      
-      /* Create a backdrop for the login form in mobile */
-      body.mobile-form-visible::before {
-        content: '';
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.95);
-        z-index: 999;
-      }
-      
-      /* Make the login form better on mobile */
-      .login-form {
-        background-color: rgba(18, 18, 18, 0.95);
-        border: 1px solid var(--primary-color);
-      }
-      
-      /* Adjust the form to be better positioned on mobile */
-      .bbop-container.mobile-form-visible .login-form {
-        position: relative;
-        top: -10px;
-        width: 90%;
-        max-width: 350px;
-        margin: 0 auto;
-      }<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -147,6 +108,8 @@
     }
     
     .login-overlay {
+      /* CHANGED: Add pointer-events control */
+      pointer-events: none; /* default to none when hidden so it won't block clicks */
       position: absolute;
       top: 0;
       left: 0;
@@ -165,13 +128,17 @@
       z-index: 10;
     }
     
+    /* To allow the login form itself to be clickable when overlay is shown */
+    .login-overlay.active {
+      pointer-events: all;
+      opacity: 1;
+    }
+    
     .bbop-container:hover .bbop-image {
       filter: blur(3px) brightness(0.7);
     }
     
-    .bbop-container:hover .login-overlay {
-      opacity: 1;
-    }
+    /* Desktop hover - removed the forced opacity:1 and replaced with .active usage */
     
     /* Pulsing animation for the avatar container */
     .pulse-ring {
@@ -392,7 +359,6 @@
     #chat-container {
       flex: 1;
       min-height: 500px;
-      /* Set a fixed height that works well across devices */
       height: 600px;
     }
     
@@ -416,7 +382,6 @@
       margin-bottom: 15px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
       border-left: 4px solid var(--secondary-color);
-      /* Remove max-height and overflow-y to prevent scrolling */
     }
     
     .bbop-intro-panel h3 {
@@ -470,7 +435,6 @@
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
       gap: 15px;
-      /* Remove max-height and overflow-y to prevent scrolling */
     }
     
     .prompt-card {
@@ -576,7 +540,6 @@
       z-index: 1001; /* Ensure it's above the overlay */
     }
     
-    // Mobile tap instruction - changed to be clearer
     .mobile-tap-instruction {
       display: none;
       text-align: center;
@@ -585,7 +548,6 @@
       color: #aaa;
     }
     
-    /* Mobile responsive styles */
     @media (max-width: 768px) {
       body {
         padding: 10px;
@@ -602,28 +564,14 @@
       .bbop-container {
         width: 300px;
         height: 300px;
-        cursor: default; /* Remove pointer cursor on mobile */
+        cursor: pointer; /* CHANGED: Keep pointer for mobile as well */
       }
       
       .robot-text {
         font-size: 28px;
       }
       
-      /* Disable hover effects on mobile */
-      .bbop-container:hover .bbop-image {
-        filter: none;
-      }
-      
-      .bbop-container:hover .login-overlay {
-        opacity: 0; /* Keep overlay hidden even on hover for mobile */
-      }
-      
-      /* Only show login overlay when the mobile-form-visible class is applied */
-      .login-overlay {
-        opacity: 0;
-        border-radius: 0;
-        padding: 20px;
-      }
+      /* Remove forced overlay hidden on hover for mobile. Tapping the avatar triggers JS. */
       
       .close-overlay {
         display: block;
@@ -645,19 +593,17 @@
         -webkit-appearance: none;
       }
       
-      /* Make sure input has proper focus styling */
       .form-input {
         -webkit-appearance: none;
         -webkit-tap-highlight-color: rgba(0,0,0,0);
         border-radius: 10px;
         position: relative;
-        z-index: 1002; /* Ensure it's above other elements */
+        z-index: 1002;
       }
       
-      /* Mobile button enhancements */
       .btn {
         position: relative;
-        z-index: 1002; /* Ensure it's above other elements */
+        z-index: 1002;
         -webkit-tap-highlight-color: rgba(0,0,0,0);
       }
       
@@ -675,7 +621,6 @@
         flex-direction: column;
       }
       
-      /* Adjust chat interface for mobile */
       .student-info {
         flex-direction: column;
         align-items: flex-start;
@@ -690,18 +635,15 @@
         height: 500px;
       }
       
-      /* Make the prompt cards full width on mobile */
       .prompt-cards {
         grid-template-columns: 1fr;
       }
       
-      /* Make copy button always visible on mobile */
       .prompt-card .copy-btn {
         opacity: 1;
       }
     }
     
-    /* For very small screens */
     @media (max-width: 350px) {
       .bbop-container {
         width: 250px;
@@ -734,17 +676,19 @@
     <div id="login-section">
       <div class="bbop-container" id="bbop-container">
         <div class="pulse-ring"></div>
-        <!-- Improved image loading with better fallback -->
-        <img src="https://raw.githubusercontent.com/uqsmitc6/BBOP/refs/heads/main/BBOP_icon.jpg" alt="B-BOP Robot Avatar" class="bbop-image" crossorigin="anonymous" onerror="this.style.display='none'; this.parentNode.querySelector('.bbop-image-fallback').style.display='flex';">
+        <img src="https://raw.githubusercontent.com/uqsmitc6/BBOP/refs/heads/main/BBOP_icon.jpg"
+             alt="B-BOP Robot Avatar"
+             class="bbop-image"
+             crossorigin="anonymous"
+             onerror="this.style.display='none'; this.parentNode.querySelector('.bbop-image-fallback').style.display='flex';">
         
         <div class="bbop-image-fallback" style="display: none;">
           <span class="robot-text">B-BOP</span>
         </div>
         
+        <!-- CHANGED: Added 'active' class usage to show/hide overlay -->
         <div class="login-overlay" id="login-overlay">
-          <!-- Add close button for mobile -->
           <div class="close-overlay" id="close-overlay">×</div>
-          
           <div class="login-form">
             <h3 class="form-title">Enter Student ID</h3>
             <input type="text" id="studentIdInput" class="form-input" placeholder="e.g., s1234567" autocomplete="off">
@@ -761,10 +705,7 @@
         </div>
       </div>
       
-      <!-- Mobile tap instruction -->
       <p class="mobile-tap-instruction">Tap on B-BOP to login or use the button below</p>
-      
-      <!-- Dedicated login button for mobile -->
       <button class="mobile-login-button" id="mobile-login-button">
         Login to B-BOP
       </button>
@@ -841,7 +782,6 @@
   </div>
   
   <script>
-    // Get DOM elements
     const bbopContainer = document.getElementById('bbop-container');
     const loginOverlay = document.getElementById('login-overlay');
     const verifyBtn = document.getElementById('verifyBtn');
@@ -858,120 +798,62 @@
     const mobileLoginButton = document.getElementById('mobile-login-button');
     const closeOverlay = document.getElementById('close-overlay');
     
-    // Function to detect touch capability
-    function isTouchDevice() {
-      return ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (navigator.msMaxTouchPoints > 0);
-    }
+    // CHANGED: Removed device-check gating. We'll let both desktop & mobile click the avatar.
+    // If you want a separate mobile button, you can keep it as well.
     
-    // Debug console logging for mobile issues
-    console.log("Device has touch capability:", isTouchDevice());
+    // Clicking the B-BOP avatar shows the login form
+    bbopContainer.addEventListener('click', function() {
+      console.log("BBOP container clicked - show login overlay on any device");
+      showLoginForm();
+    });
     
-    // Function to show the login form
-    function showLoginForm() {
-      console.log("showLoginForm called");
-      document.body.classList.add('mobile-form-visible');
-      bbopContainer.classList.add('mobile-form-visible');
-      
-      // Focus the input field
-      setTimeout(() => {
-        studentIdInput.focus();
-        console.log("Input focused");
-      }, 300);
-    }
+    // Also let the dedicated mobile login button do the same
+    mobileLoginButton.addEventListener('click', function() {
+      console.log("Mobile login button clicked");
+      showLoginForm();
+    });
     
-    // Function to hide the login form
-    function hideLoginForm() {
-      console.log("hideLoginForm called");
-      document.body.classList.remove('mobile-form-visible');
-      bbopContainer.classList.remove('mobile-form-visible');
-    }
-    
-    // Function to copy prompt text to clipboard
-    function copyPrompt(element) {
-      const promptText = element.querySelector('p').textContent;
-      navigator.clipboard.writeText(promptText).then(() => {
-        // Show toast notification
-        showToast('Prompt copied to clipboard!');
-        
-        // Highlight the copied card
-        element.style.backgroundColor = 'rgba(81, 36, 122, 0.4)';
-        setTimeout(() => {
-          element.style.backgroundColor = '';
-        }, 1000);
-      }).catch(err => {
-        console.error('Failed to copy text: ', err);
-      });
-    }
-    
-    // Function to show toast notification
-    function showToast(message) {
-      // Create toast if it doesn't exist
-      let toast = document.getElementById('copy-toast');
-      if (!toast) {
-        toast = document.createElement('div');
-        toast.id = 'copy-toast';
-        toast.className = 'toast';
-        document.body.appendChild(toast);
-      }
-      
-      // Set message and show
-      toast.textContent = message;
-      toast.classList.add('show');
-      
-      // Hide after 2 seconds
-      setTimeout(() => {
-        toast.classList.remove('show');
-      }, 2000);
-    }
-    
-    // Setup event listeners - differently for mobile and desktop
-    if (isTouchDevice()) {
-      // For mobile devices, only the login button shows the form
-      // Disable the bbop container click on mobile
-      mobileLoginButton.addEventListener('click', function() {
-        console.log("Mobile login button clicked");
-        showLoginForm();
-      });
-    } else {
-      // Desktop behavior - clicking the avatar shows login overlay
-      bbopContainer.addEventListener('click', function() {
-        console.log("BBOP container clicked (desktop)");
-        showLoginForm();
-      });
-    }
-    
-    // Close button hides the form (on all devices)
+    // The close button hides the form
     closeOverlay.addEventListener('click', function(e) {
-      console.log("Close button clicked");
       e.stopPropagation();
       hideLoginForm();
     });
     
-    // Prevent form clicks from bubbling to container (on all devices)
-    loginOverlay.addEventListener('click', function(e) {
-      e.stopPropagation();
-    });
+    // DO NOT stopPropagation on overlay click so the button can be clicked properly
+    // (If you want the overlay to close when tapping outside the form, you can handle that here.)
+    
+    // Show and hide login overlay
+    function showLoginForm() {
+      console.log("showLoginForm called");
+      loginOverlay.classList.add('active'); // enable pointer-events and set opacity to 1
+      // Focus the input after short delay
+      setTimeout(() => {
+        studentIdInput.focus();
+      }, 300);
+    }
+    function hideLoginForm() {
+      console.log("hideLoginForm called");
+      loginOverlay.classList.remove('active');
+    }
     
     // Store verified student data
     let verifiedStudent = null;
     
-    // Add event listener for the verify button
-    verifyBtn.addEventListener('click', function(e) {
+    // Listen for the verify button
+    verifyBtn.addEventListener('click', function() {
       console.log("Verify button clicked");
       verifyStudentId();
     });
     
-    // Also verify when pressing Enter in the input field
+    // Also verify on Enter
     studentIdInput.addEventListener('keypress', function(event) {
       if (event.key === 'Enter') {
-        console.log("Enter key pressed in input");
         verifyStudentId();
       }
     });
     
     // Verification function
     async function verifyStudentId() {
-      console.log("verifyStudentId function called");
       let studentId = studentIdInput.value.trim();
       errorMsg.textContent = ""; // clear previous errors
       
@@ -982,157 +864,84 @@
         return;
       }
       
-      // For troubleshooting only - allow any student ID for testing
-      // Change this to enforce proper validation in production
-      const TESTING_MODE = true; // Set to false for production
-      
-      if (TESTING_MODE) {
-        console.log("TESTING MODE ENABLED - Accepting any ID format");
-        // Normalize the case for student and staff IDs
-        if (studentId.toLowerCase().startsWith('s')) {
-          studentId = studentId.toLowerCase();
-        } else if (studentId.toLowerCase().startsWith('uq')) {
-          studentId = studentId.toLowerCase();
-        }
-      } else {
-        // Basic format validation for students and secret support for staff
-        const studentIdRegex = /^s\d{7}$/i;
-        const staffIdRegex = /^uq[a-z0-9]{6}$/i;
-        
-        // Allow both student and staff IDs to pass, but only show error for student format
-        if (!studentIdRegex.test(studentId) && !staffIdRegex.test(studentId)) {
-          errorMsg.textContent = "Please enter a valid student ID in the format sXXXXXXX";
-          return;
-        }
-        
-        // Normalize the case for student and staff IDs
-        if (studentId.toLowerCase().startsWith('s')) {
-          studentId = studentId.toLowerCase();
-        } else if (studentId.toLowerCase().startsWith('uq')) {
-          studentId = studentId.toLowerCase();
-        }
-      }
-      
-      // Show loading message
+      // For troubleshooting: let any ID through
+      const TESTING_MODE = true;
       loadingMsg.style.display = "flex";
       
       try {
-        // For troubleshooting - use mock data instead of API call
         if (TESTING_MODE) {
           console.log("TESTING MODE - Using mock verification");
-          
-          // Short delay for UI feedback
           await new Promise(resolve => setTimeout(resolve, 800));
           
-          // Mock result (always valid in testing mode)
           const mockResult = {
             valid: true,
             id: studentId,
             name: studentId.startsWith('uq') ? "Staff User" : "Test Student"
           };
           
-          // Hide loading message
           loadingMsg.style.display = "none";
-          
-          // Store the mock student data
           verifiedStudent = mockResult;
-          
-          // Hide login form
           hideLoginForm();
           
-          // Show the confirmation section
           loginSection.style.display = "none";
           verificationContainer.style.display = "block";
           successMsg.textContent = `Hello, ${mockResult.name}! Is this correct?`;
           
           console.log("Mock verification complete:", mockResult);
         } else {
-          // PRODUCTION MODE - Call the Google Apps Script to verify
+          // Real call (production)
           const apiUrl = 'https://script.google.com/macros/s/AKfycbzestJvZt4tdl_a0Ka2I8u4wkM4rrEH3rqeyLQle_dhlXFpDaGgm_RpK11fGZbtw0T0/exec';
-          console.log("Verifying student ID with API:", studentId);
-          
           const response = await fetch(`${apiUrl}?id=${encodeURIComponent(studentId)}`);
-          console.log("Response status:", response.status);
-          
-          // Hide loading message
           loadingMsg.style.display = "none";
-          
           if (!response.ok) {
             throw new Error(`Server error: ${response.status}`);
           }
           
-          // Parse the response
           const result = await response.json();
           console.log("Verification result:", result);
           
-          // Check if the ID was found
           if (result.valid) {
-            // Store the verified student data
             verifiedStudent = result;
-            
-            // Hide login form
             hideLoginForm();
-            
-            // Show the confirmation section
             loginSection.style.display = "none";
             verificationContainer.style.display = "block";
             successMsg.textContent = `Hello, ${result.name}! Is this correct?`;
           } else {
-            // ID not found
             errorMsg.textContent = "Student ID not found. Please check your ID or contact your course coordinator.";
           }
         }
       } catch (err) {
-        // Hide loading message
         loadingMsg.style.display = "none";
         console.error("Verification error:", err);
         errorMsg.textContent = "Error verifying ID. Please try again later.";
       }
     }
     
-    // Add event listener for the confirm button
+    // Confirm / cancel
     confirmBtn.addEventListener('click', () => {
-      console.log("Confirm button clicked");
       if (verifiedStudent) {
-        // Hide the verification section
         verificationContainer.style.display = "none";
-        
-        // Update student info display in the header bar
         document.getElementById('student-name-display').textContent = verifiedStudent.name;
         document.getElementById('student-id-display').textContent = verifiedStudent.id;
-        
-        // Show the chat interface
         chatInterface.style.display = "block";
-        
-        // Launch the chatbot with the verified student data
         launchChatbot(verifiedStudent);
       }
     });
     
-    // Add event listener for the cancel button
     cancelBtn.addEventListener('click', () => {
-      console.log("Cancel button clicked");
-      // Go back to the login section
       verificationContainer.style.display = "none";
       loginSection.style.display = "block";
-      // Clear the input field
       studentIdInput.value = "";
-      // Reset mobile form visibility
-      hideLoginForm();
     });
     
-    // Function to launch the chatbot
+    // Launch chatbot
     function launchChatbot(studentData) {
-      // Prepare the chatbot URL
       let chatbotUrl = "https://interfaces.zapier.com/embed/chatbot/cm6g1x781001m1fs6d6i4c3j1";
-      
-      // Use the parameters that work
       chatbotUrl += `?studentId=${encodeURIComponent(studentData.id)}`;
       chatbotUrl += `&studentName=${encodeURIComponent(studentData.name)}`;
       
       console.log("Loading chatbot with URL:", chatbotUrl);
       
-      // Create an iframe to embed the chatbot
       const iframe = document.createElement('iframe');
       iframe.src = chatbotUrl;
       iframe.width = "100%";
@@ -1140,9 +949,39 @@
       iframe.style.border = "none";
       iframe.setAttribute('allow', 'clipboard-write *');
       
-      // Add the iframe to the chatbot container
       chatContainer.innerHTML = "";
       chatContainer.appendChild(iframe);
+    }
+    
+    // Copy prompt
+    function copyPrompt(element) {
+      const promptText = element.querySelector('p').textContent;
+      navigator.clipboard.writeText(promptText).then(() => {
+        showToast('Prompt copied to clipboard!');
+        element.style.backgroundColor = 'rgba(81, 36, 122, 0.4)';
+        setTimeout(() => {
+          element.style.backgroundColor = '';
+        }, 1000);
+      }).catch(err => {
+        console.error('Failed to copy text: ', err);
+      });
+    }
+    
+    // Toast
+    function showToast(message) {
+      let toast = document.getElementById('copy-toast');
+      if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'copy-toast';
+        toast.className = 'toast';
+        document.body.appendChild(toast);
+      }
+      
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2000);
     }
   </script>
 </body>
