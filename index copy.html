@@ -369,6 +369,36 @@
       clear: both;
     }
     
+    /* Alternative login button for mobile */
+    .mobile-login-button {
+      display: none;
+      margin-top: 20px;
+      width: 250px;
+      padding: 15px 20px;
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 30px;
+      font-size: 18px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      animation: pulse-button 2s infinite;
+    }
+    
+    @keyframes pulse-button {
+      0% {
+        box-shadow: 0 0 0 0 rgba(81, 36, 122, 0.7);
+      }
+      70% {
+        box-shadow: 0 0 0 10px rgba(81, 36, 122, 0);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(81, 36, 122, 0);
+      }
+    }
+    
     /* BBOP Introduction styles */
     .bbop-intro-panel {
       background-color: rgba(30, 30, 30, 0.95);
@@ -498,9 +528,138 @@
       opacity: 1;
     }
     
-    /* Hide mobile elements by default */
-    .mobile-login-button, .close-overlay, .mobile-tap-instruction {
-      display: none;
+    /* Mobile optimization */
+    @media (max-width: 768px) {
+      .bbop-container {
+        width: 100%;
+        max-width: 300px;
+        height: 300px;
+        position: relative;
+      }
+      
+      .robot-text {
+        font-size: 36px;
+      }
+      
+      /* Show mobile login button instead of tap instruction */
+      .mobile-login-button {
+        display: block;
+      }
+      
+      /* Hide the tap instruction since we're using a button */
+      .mobile-tap-instruction {
+        display: none;
+      }
+      
+      /* Always show login overlay when mobile-form-visible class is applied */
+      .mobile-form-visible .login-overlay {
+        opacity: 1;
+        background-color: rgba(0, 0, 0, 0.8);
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1000;
+        border-radius: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      
+      .mobile-form-visible .bbop-image {
+        filter: blur(3px) brightness(0.7);
+      }
+      
+      /* Add a close button for the mobile login overlay */
+      .close-overlay {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        width: 40px;
+        height: 40px;
+        background-color: rgba(0, 0, 0, 0.5);
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: white;
+        font-size: 24px;
+        cursor: pointer;
+      }
+      
+      .header h1 {
+        font-size: 32px;
+      }
+      
+      .header p {
+        font-size: 16px;
+      }
+      
+      .form-title {
+        font-size: 22px;
+      }
+      
+      .form-input, .btn {
+        padding: 12px;
+        font-size: 16px;
+      }
+      
+      .login-form {
+        width: 90%;
+        padding: 20px;
+        max-width: 320px;
+      }
+      
+      #chat-container {
+        height: 500px;
+      }
+      
+      .button-group {
+        flex-direction: column;
+      }
+      
+      .verification-container {
+        max-width: 320px;
+      }
+      
+      .prompt-cards {
+        grid-template-columns: 1fr;
+        max-height: 380px;
+      }
+      
+      .bbop-intro-panel {
+        padding: 15px;
+        max-height: none;
+      }
+      
+      .chat-interface {
+        height: auto;
+      }
+      
+      #chat-container {
+        height: 450px;
+        min-height: auto;
+      }
+    }
+    
+    /* Tablet optimization */
+    @media (min-width: 769px) and (max-width: 1024px) {
+      .bbop-container {
+        width: 500px;
+        height: 500px;
+      }
+    }
+    
+    /* Touch device specific styles */
+    @media (hover: none) {
+      .bbop-container:hover .login-overlay {
+        opacity: 0; /* Disable hover effect on touch devices */
+      }
+      
+      .bbop-container:hover .bbop-image {
+        filter: none; /* Disable hover effect on touch devices */
+      }
     }
   </style>
 </head>
@@ -636,12 +795,12 @@
     const mobileLoginButton = document.getElementById('mobile-login-button');
     const closeOverlay = document.getElementById('close-overlay');
     
-    // Function to detect touch capability - keeping this to preserve login functionality
+    // Function to detect touch capability
     function isTouchDevice() {
       return ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (navigator.msMaxTouchPoints > 0);
     }
     
-    // Function to show the login form - keeping this to preserve login functionality
+    // Function to show the login form
     function showLoginForm() {
       document.body.classList.add('mobile-form-visible');
       bbopContainer.classList.add('mobile-form-visible');
@@ -652,7 +811,7 @@
       }, 300);
     }
     
-    // Function to hide the login form - keeping this to preserve login functionality
+    // Function to hide the login form
     function hideLoginForm() {
       document.body.classList.remove('mobile-form-visible');
       bbopContainer.classList.remove('mobile-form-visible');
@@ -696,7 +855,7 @@
       }, 2000);
     }
     
-    // Preserve the original event listener setup for login
+    // Set up appropriate event listeners
     if (isTouchDevice()) {
       // Mobile login button shows the form
       mobileLoginButton.addEventListener('click', showLoginForm);
